@@ -1,0 +1,23 @@
+[0.492s] Invoking command in '/home/youssef/cleaning_robot_project/Ros2_ws/build/GUI': PYTHONPATH=/home/youssef/cleaning_robot_project/Ros2_ws/build/GUI/prefix_override:/home/youssef/cleaning_robot_project/Ros2_ws/install/GUI/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated setup.py develop --editable --build-directory /home/youssef/cleaning_robot_project/Ros2_ws/build/GUI/build --no-deps symlink_data
+[0.695s] running develop
+[0.808s] running egg_info
+[0.808s] creating GUI.egg-info
+[0.808s] writing GUI.egg-info/PKG-INFO
+[0.808s] writing dependency_links to GUI.egg-info/dependency_links.txt
+[0.808s] writing entry points to GUI.egg-info/entry_points.txt
+[0.808s] writing requirements to GUI.egg-info/requires.txt
+[0.808s] writing top-level names to GUI.egg-info/top_level.txt
+[0.808s] writing manifest file 'GUI.egg-info/SOURCES.txt'
+[0.809s] reading manifest file 'GUI.egg-info/SOURCES.txt'
+[0.809s] writing manifest file 'GUI.egg-info/SOURCES.txt'
+[0.810s] running build_ext
+[0.810s] Creating /home/youssef/cleaning_robot_project/Ros2_ws/install/GUI/lib/python3.10/site-packages/GUI.egg-link (link to .)
+[0.811s] 
+[0.811s] Installed /home/youssef/cleaning_robot_project/Ros2_ws/build/GUI
+[0.811s] running symlink_data
+[0.811s] creating /home/youssef/cleaning_robot_project/Ros2_ws/install/GUI/share/ament_index
+[0.811s] creating /home/youssef/cleaning_robot_project/Ros2_ws/install/GUI/share/ament_index/resource_index
+[0.811s] creating /home/youssef/cleaning_robot_project/Ros2_ws/install/GUI/share/ament_index/resource_index/packages
+[0.811s] symbolically linking /home/youssef/cleaning_robot_project/Ros2_ws/build/GUI/resource/GUI -> /home/youssef/cleaning_robot_project/Ros2_ws/install/GUI/share/ament_index/resource_index/packages
+[0.811s] symbolically linking /home/youssef/cleaning_robot_project/Ros2_ws/build/GUI/package.xml -> /home/youssef/cleaning_robot_project/Ros2_ws/install/GUI/share/GUI
+[0.831s] Invoked command in '/home/youssef/cleaning_robot_project/Ros2_ws/build/GUI' returned '0': PYTHONPATH=/home/youssef/cleaning_robot_project/Ros2_ws/build/GUI/prefix_override:/home/youssef/cleaning_robot_project/Ros2_ws/install/GUI/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated setup.py develop --editable --build-directory /home/youssef/cleaning_robot_project/Ros2_ws/build/GUI/build --no-deps symlink_data
