@@ -12,7 +12,7 @@ from ui.main_window import Ui_MainWindow as View
 # sys.path.append("/home/youssef/gui_ws/src/gui/gui/logic")
 from logic.RoverMain import Rover_Main 
 
-sys.path.append("src/gui/gui/src/utilss")
+# sys.path.append("src/gui/gui/src/utilss")
 
 from utilss.utils import Utils
 from threading import Thread
