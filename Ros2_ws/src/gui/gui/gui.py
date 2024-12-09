@@ -1,25 +1,38 @@
-import cv2
+#!/usr/bin/env python3
+import sys
+import rclpy
+from rclpy.node import Node
+import sys
+from rclpy.executors import MultiThreadedExecutor
+from PySide6.QtWidgets import QMainWindow, QApplication
 
-# Replace with the IP address shown in the IP Webcam app
-ip_address = "http://192.168.0.107:8080/video"
+from ui.main_window import Ui_MainWindow as View
 
-# Capture video from the IP Webcam
-cap = cv2.VideoCapture(ip_address)
+# sys.path.append("/home/youssef/gui_ws/src/gui/gui/logic")
+from logic.main_tab import Rover_Main 
+from threading import Thread
 
-while True:
-    # Read the video stream
-    ret, frame = cap.read()
-    if not ret:
-        print("Failed to grab frame")
-        break
+class MyGUI(QMainWindow, View):
+    def __init__(self, parent=None):
+        super(MyGUI, self).__init__(parent)
+        self.setupUi(self)
 
-    # Display the video
-    cv2.imshow("IP Webcam", frame)
+        self.setWindowTitle("Bor3y Main")
 
-    # Press 'q' to exit the loop
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
+        rclpy.init()
+        self.executor = MultiThreadedExecutor()
+        self.RoverMainTab = Rover_Main(executor=self.executor)
 
-# Release resources
-cap.release()
-cv2.destroyAllWindows()
+        self.tabWidget.addTab(self.RoverMainTab, "Main")
+
+        executor_thread = Thread(target=self.executor.spin, daemon=True)
+        executor_thread.start()
+
+def main(args=None):
+    app = QApplication(sys.argv)
+    window = MyGUI()
+    window.show()
+    app.exec()
+
+if __name__ == "__main__":
+    main()
