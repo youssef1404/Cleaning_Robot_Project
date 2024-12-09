@@ -1,25 +1,30 @@
-import cv2
+#!/usr/bin/env python3
 
-# Replace with the IP address shown in the IP Webcam app
-ip_address = "http://192.168.0.107:8080/video"
+import rclpy 
+from rclpy.node import Node
+from sensor_msgs.msg import Image 
+from cv_bridge import CvBridge, CvBridgeError 
+import cv2 as cv
+from PySide6.QtCore import *
+from PySide6.QtGui import *
+from utilss.utils import Utils
 
-# Capture video from the IP Webcam
-cap = cv2.VideoCapture(ip_address)
+class Camera(Node):
+    def __init__(self, name, address, label):
+        super().__init__(f"{name.lower()}_camera_frames")
+        self.name = name.lower()
+        self.address = address
+        self.timer = self.create_timer(0.01, self.timer_callback)
+        self.cap = cv.VideoCapture(self.address)
+        self.label = label
 
-while True:
-    # Read the video stream
-    ret, frame = cap.read()
-    if not ret:
-        print("Failed to grab frame")
-        break
+    def timer_callback(self):    
+        ret, frame = self.cap.read()
+        if ret:
+            try: 
+                self.label.setPixmap(QPixmap.fromImage(Utils.arrayToQImage(frame)))
+            except:
+                print(f"{self.name}: No connection trying to reconnect....")
+                print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
 
-    # Display the video
-    cv2.imshow("IP Webcam", frame)
-
-    # Press 'q' to exit the loop
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
-
-# Release resources
-cap.release()
-cv2.destroyAllWindows()
+        self.get_logger().info(f'Reading {self.name} camera frames')     

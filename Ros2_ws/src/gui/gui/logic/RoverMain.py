@@ -6,13 +6,17 @@ import sys
 from std_msgs.msg import Int16, Float32, Bool
 
 from ui.rover_main import Ui_Form as View
+from thread.camera import Camera
 from rclpy.executors import MultiThreadedExecutor
 from PyQt5.QtGui import QImage, QPixmap
 
-
 class Rover_Main(QWidget, View):
-    def __init__(self, parent=None, executor:MultiThreadedExecutor = None, camera=None):
+    def __init__(self, parent = None, executor:MultiThreadedExecutor = None):
         super(Rover_Main, self).__init__(parent)
         self.setupUi(self)
         self.excutor = executor
+
+        self.webcam = Camera(name='main', address="http://192.168.0.102:8080/video", label=self.camera_label)
+
+        self.excutor.add_node(self.webcam)
 
