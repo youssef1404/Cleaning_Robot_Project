@@ -27,4 +27,4 @@ class Camera(Node):
                 print(f"{self.name}: No connection trying to reconnect....")
                 print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
 
-        self.get_logger().info(f'Reading {self.name} camera frames')     
+        # self.get_logger().info(f'Reading {self.name} camera frames')     

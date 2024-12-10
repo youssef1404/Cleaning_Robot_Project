@@ -13,11 +13,13 @@
 #endif
 
 // Wi-Fi credentials
-#define WIFI_SSID "Etisalat 4G Router_bf15"       // Replace with your Wi-Fi SSID
-#define WIFI_PASSWORD "ydknn55443" // Replace with your Wi-Fi password
+// #define WIFI_SSID "Etisalat 4G Router_bf15"       // Replace with your Wi-Fi SSID
+// #define WIFI_PASSWORD "ydknn55443" // Replace with your Wi-Fi password
+#define WIFI_SSID "Honor 50"       // Replace with your Wi-Fi SSID
+#define WIFI_PASSWORD "12345678" // Replace with your Wi-Fi password
 
 // Micro-ROS Agent details
-#define AGENT_IP "192.168.0.103"           // Replace with your Micro-ROS Agent IP
+#define AGENT_IP "192.168.153.203"           // Replace with your Micro-ROS Agent IP
 #define AGENT_PORT 8888                  // Replace with your Micro-ROS Agent Port
 
 rcl_publisher_t publisher;
