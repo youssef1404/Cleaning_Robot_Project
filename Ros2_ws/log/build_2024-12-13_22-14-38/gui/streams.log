@@ -1,0 +1,36 @@
+[0.340s] Invoking command in '/home/mai/Cleaning_Robot_Project/Ros2_ws/src/gui': PYTHONPATH=/home/mai/Cleaning_Robot_Project/Ros2_ws/build/gui/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/mai/Cleaning_Robot_Project/Ros2_ws/install/gui/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/gui build --build-base /home/mai/Cleaning_Robot_Project/Ros2_ws/build/gui/build install --record /home/mai/Cleaning_Robot_Project/Ros2_ws/build/gui/install.log --single-version-externally-managed install_data
+[0.482s] running egg_info
+[0.482s] creating ../../build/gui/gui.egg-info
+[0.482s] writing ../../build/gui/gui.egg-info/PKG-INFO
+[0.482s] writing dependency_links to ../../build/gui/gui.egg-info/dependency_links.txt
+[0.482s] writing entry points to ../../build/gui/gui.egg-info/entry_points.txt
+[0.482s] writing requirements to ../../build/gui/gui.egg-info/requires.txt
+[0.482s] writing top-level names to ../../build/gui/gui.egg-info/top_level.txt
+[0.482s] writing manifest file '../../build/gui/gui.egg-info/SOURCES.txt'
+[0.483s] reading manifest file '../../build/gui/gui.egg-info/SOURCES.txt'
+[0.484s] writing manifest file '../../build/gui/gui.egg-info/SOURCES.txt'
+[0.484s] running build
+[0.484s] running build_py
+[0.484s] creating /home/mai/Cleaning_Robot_Project/Ros2_ws/build/gui/build
+[0.484s] creating /home/mai/Cleaning_Robot_Project/Ros2_ws/build/gui/build/lib
+[0.484s] creating /home/mai/Cleaning_Robot_Project/Ros2_ws/build/gui/build/lib/gui
+[0.484s] copying gui/__init__.py -> /home/mai/Cleaning_Robot_Project/Ros2_ws/build/gui/build/lib/gui
+[0.484s] copying gui/gui.py -> /home/mai/Cleaning_Robot_Project/Ros2_ws/build/gui/build/lib/gui
+[0.484s] running install
+[0.484s] running install_lib
+[0.485s] creating /home/mai/Cleaning_Robot_Project/Ros2_ws/install/gui/lib/python3.10/site-packages/gui
+[0.485s] copying /home/mai/Cleaning_Robot_Project/Ros2_ws/build/gui/build/lib/gui/__init__.py -> /home/mai/Cleaning_Robot_Project/Ros2_ws/install/gui/lib/python3.10/site-packages/gui
+[0.485s] copying /home/mai/Cleaning_Robot_Project/Ros2_ws/build/gui/build/lib/gui/gui.py -> /home/mai/Cleaning_Robot_Project/Ros2_ws/install/gui/lib/python3.10/site-packages/gui
+[0.485s] byte-compiling /home/mai/Cleaning_Robot_Project/Ros2_ws/install/gui/lib/python3.10/site-packages/gui/__init__.py to __init__.cpython-310.pyc
+[0.485s] byte-compiling /home/mai/Cleaning_Robot_Project/Ros2_ws/install/gui/lib/python3.10/site-packages/gui/gui.py to gui.cpython-310.pyc
+[0.485s] running install_data
+[0.485s] creating /home/mai/Cleaning_Robot_Project/Ros2_ws/install/gui/share/ament_index
+[0.485s] creating /home/mai/Cleaning_Robot_Project/Ros2_ws/install/gui/share/ament_index/resource_index
+[0.485s] creating /home/mai/Cleaning_Robot_Project/Ros2_ws/install/gui/share/ament_index/resource_index/packages
+[0.485s] copying resource/gui -> /home/mai/Cleaning_Robot_Project/Ros2_ws/install/gui/share/ament_index/resource_index/packages
+[0.485s] copying package.xml -> /home/mai/Cleaning_Robot_Project/Ros2_ws/install/gui/share/gui
+[0.485s] running install_egg_info
+[0.487s] Copying ../../build/gui/gui.egg-info to /home/mai/Cleaning_Robot_Project/Ros2_ws/install/gui/lib/python3.10/site-packages/gui-0.0.0-py3.10.egg-info
+[0.487s] running install_scripts
+[0.500s] writing list of installed files to '/home/mai/Cleaning_Robot_Project/Ros2_ws/build/gui/install.log'
+[0.514s] Invoked command in '/home/mai/Cleaning_Robot_Project/Ros2_ws/src/gui' returned '0': PYTHONPATH=/home/mai/Cleaning_Robot_Project/Ros2_ws/build/gui/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/mai/Cleaning_Robot_Project/Ros2_ws/install/gui/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/gui build --build-base /home/mai/Cleaning_Robot_Project/Ros2_ws/build/gui/build install --record /home/mai/Cleaning_Robot_Project/Ros2_ws/build/gui/install.log --single-version-externally-managed install_data
