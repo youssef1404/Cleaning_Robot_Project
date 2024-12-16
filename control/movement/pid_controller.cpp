@@ -8,7 +8,7 @@ PIDController::PIDController(float Kp, float Ki, float Kd) {
   _lastError = 0;
 }
 
-float PIDController::calculateOutput(float setpoint, float measurement) {
+float PIDController::calculateOutput(float setpoint, float measurement,float dt) {
   _error = setpoint - measurement;
   _integral += _error * dt;
   float derivative = (_error - _lastError) / dt;
