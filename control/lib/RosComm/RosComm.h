@@ -49,6 +49,7 @@ class RosComm
         size_t agent_port;
         const char *ssid;
         const char *psk;
+
         States state;
 
         // entities
@@ -75,6 +76,7 @@ class RosComm
         bool create_entities();
 
         float distance;
+        int keyVal;
 
     public:
         bool sub_new_data;
@@ -88,7 +90,8 @@ class RosComm
         void printCurrentNet();
         void updateUltraMsg();
         float getDistance();
-
+        void updateKeyboardValue();
+        int getkeyboardValue();
 };
 
 

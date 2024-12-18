@@ -15,6 +15,7 @@ std_msgs__msg__Float32 RosComm::ultra_msg;
 			return false;            \
 		}                            \
 	}
+
 #define EXECUTE_EVERY_N_MS(MS, X)          \
 	do                                     \
 	{                                      \
@@ -32,7 +33,7 @@ std_msgs__msg__Float32 RosComm::ultra_msg;
 
 RosComm::RosComm(): node_name("esp32"),
                     ultra_topic_name("/distance"),
-                    motor_feed_topic_name("/motors"),
+                    // motor_feed_topic_name("/motors"),
                     agent_ip(192, 168, 1, 18),
                     agent_port(AGENT_PORT),
                     ssid(WIFI_SSID),
@@ -144,25 +145,20 @@ void RosComm::loop()
 		this->destroy();
 		state = WAITING_AGENT;
 		break;
-    
+
     default:
         break;
     }
 
     if (state == AGENT_CONNECTED)
-	{ // blink when agent connected
-        for (int i = 0; i < 5; i++){
-            digitalWrite(LED_PIN, LOW);
-            delay(500);
             digitalWrite(LED_PIN, HIGH);
-        }
-	}
 	else
 	{
 		digitalWrite(LED_PIN, LOW);
 		delay(100);
 	}
-    // update_keyboard_number();
+
+    updateKeyboardValue();
     updateUltraMsg();
 }
 
@@ -202,10 +198,18 @@ void RosComm::printCurrentNet()
 
 void RosComm::updateUltraMsg()
 {
-    if (state == AGENT_CONNECTED)
-        this->distance = RosComm::ultra_msg.data;
+    this->distance = RosComm::ultra_msg.data;
 }
 
 float RosComm::getDistance(){
     return this->distance;
+}
+
+void RosComm::updateKeyboardValue(){ 
+    if (state == AGENT_CONNECTED)
+        this->keyVal = RosComm::key_msg.data;
+}
+
+int RosComm::getkeyboardValue(){
+    return this->keyVal;
 }
