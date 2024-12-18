@@ -8,13 +8,10 @@ void MotorDriver::initialMotors(){
         pinMode(this->driverPins[i], OUTPUT);
     }
     // stop the motors
-    for(int i = 0; i < 4; i++){
-        digitalWrite(this->driverPins[i], LOW);
-    }
+    MotorDriver::stop();
 }
 
 void MotorDriver::moveForward() {
-
     // Motor A forward
     digitalWrite(this->driverPins[0], LOW); // IN1
     digitalWrite(this->driverPins[1], HIGH); // IN2

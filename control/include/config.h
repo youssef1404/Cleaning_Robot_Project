@@ -11,8 +11,9 @@
 #define RIGHT_MOTOR_ENCA 18
 #define RIGHT_MOTOR_ENCA 19
 
-#define SERVO1_PIN 33
-#define SERVO2_PIN 34
+#define SERVO_PIN 15
+#define UPPER_LIMIT 180
+#define LOWER_LIMIT 0
 
 #define ULTRA1_TRIGGER_PIN 18
 #define ULTRA1_ECHO_PIN 19
