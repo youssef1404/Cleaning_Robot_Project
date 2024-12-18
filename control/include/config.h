@@ -24,4 +24,12 @@
 #define MIN_SPEED 0
 #define DEFAULT_SPEED 50
 
+// Wi-Fi credentials
+#define WIFI_SSID "Honor 50"       
+#define WIFI_PASSWORD "12345678" 
+#define AGENT_IP "192.168.153.203"           
+#define AGENT_PORT 8888 
+
+#define LED_PIN LED_BUILTIN
+
 #endif
