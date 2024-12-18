@@ -1,11 +1,23 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#define MOTOR_LEFT_PIN 12
-#define MOTOR_RIGHT_PIN 14
+#define MOTOR_IN1 12
+#define MOTOR_IN2 13
+#define MOTOR_IN3 14
+#define MOTOR_IN4 15
+#define MOTOR_ENA 16
+#define MOTOR_ENB 17
 
-#define SENSOR_TRIGGER_PIN 18
-#define SENSOR_ECHO_PIN 19
+#define RIGHT_MOTOR_ENCA 18
+#define RIGHT_MOTOR_ENCA 19
+
+#define SERVO1_PIN 33
+#define SERVO2_PIN 34
+
+#define ULTRA1_TRIGGER_PIN 18
+#define ULTRA1_ECHO_PIN 19
+#define ULTRA2_TRIGGER_PIN 20
+#define ULTRA2_ECHO_PIN 21
 
 #define MAX_SPEED 255
 #define MIN_SPEED 0
