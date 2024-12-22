@@ -1,0 +1,18 @@
+[0.353s] Invoking command in '/home/mai/Cleaning_Robot_Project/Ros2_ws/build/gui': PYTHONPATH=/home/mai/Cleaning_Robot_Project/Ros2_ws/build/gui/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/mai/Cleaning_Robot_Project/Ros2_ws/install/gui/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/mai/Cleaning_Robot_Project/Ros2_ws/build/gui/build --no-deps symlink_data --force
+[0.508s] running develop
+[0.601s] running egg_info
+[0.601s] writing gui.egg-info/PKG-INFO
+[0.601s] writing dependency_links to gui.egg-info/dependency_links.txt
+[0.601s] writing entry points to gui.egg-info/entry_points.txt
+[0.601s] writing requirements to gui.egg-info/requires.txt
+[0.601s] writing top-level names to gui.egg-info/top_level.txt
+[0.602s] reading manifest file 'gui.egg-info/SOURCES.txt'
+[0.603s] writing manifest file 'gui.egg-info/SOURCES.txt'
+[0.604s] running build_ext
+[0.604s] Creating /home/mai/Cleaning_Robot_Project/Ros2_ws/install/gui/lib/python3.10/site-packages/gui.egg-link (link to .)
+[0.605s] 
+[0.605s] Installed /home/mai/Cleaning_Robot_Project/Ros2_ws/build/gui
+[0.605s] running symlink_data
+[0.605s] symbolically linking /home/mai/Cleaning_Robot_Project/Ros2_ws/build/gui/resource/gui -> /home/mai/Cleaning_Robot_Project/Ros2_ws/install/gui/share/ament_index/resource_index/packages
+[0.605s] symbolically linking /home/mai/Cleaning_Robot_Project/Ros2_ws/build/gui/package.xml -> /home/mai/Cleaning_Robot_Project/Ros2_ws/install/gui/share/gui
+[0.620s] Invoked command in '/home/mai/Cleaning_Robot_Project/Ros2_ws/build/gui' returned '0': PYTHONPATH=/home/mai/Cleaning_Robot_Project/Ros2_ws/build/gui/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/mai/Cleaning_Robot_Project/Ros2_ws/install/gui/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/mai/Cleaning_Robot_Project/Ros2_ws/build/gui/build --no-deps symlink_data --force

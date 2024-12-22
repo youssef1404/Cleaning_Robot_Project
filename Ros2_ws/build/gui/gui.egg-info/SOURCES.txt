@@ -10,7 +10,11 @@ setup.py
 ../../build/gui/gui.egg-info/zip-safe
 gui/__init__.py
 gui/gui.py
+gui.egg-info/PKG-INFO
+gui.egg-info/SOURCES.txt
+gui.egg-info/dependency_links.txt
+gui.egg-info/entry_points.txt
+gui.egg-info/requires.txt
+gui.egg-info/top_level.txt
+gui.egg-info/zip-safe
 resource/gui
-test/test_copyright.py
-test/test_flake8.py
-test/test_pep257.py

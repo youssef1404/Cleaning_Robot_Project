@@ -4,18 +4,21 @@ import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist
 from std_msgs.msg import String
+import keyboard
+import time
 
 class TeleopKeyboard(Node):
     def __init__(self):
         super().__init__('teleop_keyboard')
-        self.publisher = self.create_publisher(Twist, 'cmd_vel', 10.0)
-        self.mode_publisher = self.create_publisher(String, 'robot_mode', 10.0)
-        self.servo_publisher = self.create_publisher(String, 'servo_control', 10.0)
+        self.publisher = self.create_publisher(Twist, 'cmd_vel', 10) #control wheels movement after receiving speeds
+        self.mode_publisher = self.create_publisher(String, 'robot_mode', 10) #auto or manual
+        self.servo_publisher = self.create_publisher(String, 'servo_control', 10) #control servo movement after receiving "left" / "right"
         
         self.twist = Twist()
         self.speed = 255.0
         self.turn_speed = 126.0
         self.mode = "manual" 
+        self.running = True #####
 
         # W - Move forward
         # A - Turn left
@@ -32,56 +35,81 @@ class TeleopKeyboard(Node):
         
 
     def set_mode(self, mode):
-        """Set the robot mode (manual or autonomous)"""
+        #Set the robot mode (manual or autonomous)
         self.mode = mode
         msg = String()
         msg.data = mode
         self.mode_publisher.publish(msg)
         self.get_logger().info(f"Mode switched to {mode}")
 
-    def handle_key(self, key):
-        if self.mode == "manual":
-            if key == 'w':
-                self.twist.linear.x = self.speed
-                self.twist.angular.z = 0.0
-            elif key == 's':
-                self.twist.linear.x = -self.speed
-                self.twist.angular.z = 0.0
-            elif key == 'a':
-                self.twist.linear.x = 0.0
-                self.twist.angular.z = self.turn_speed
-            elif key == 'd':
-                self.twist.linear.x = 0.0
-                self.twist.angular.z = -self.turn_speed
-            elif key == ' ':
-                self.twist.linear.x = 0.0
-                self.twist.angular.z = 0.0
-            elif key == 'r':
-                self.speed = min(255, self.speed + 10.0)
-                self.turn_speed = min(255, self.turn_speed + 10.0)
-                self.get_logger().info(f"Speed increased: {self.speed}")
-            elif key == 'f':
-                self.speed = max(0.0, self.speed - 10.0)
-                self.turn_speed = max(0.0, self.turn_speed - 10.0)
-                self.get_logger().info(f"Speed decreased: {self.speed}")
-            elif key == 'q':
-                servo_msg = String()
-                servo_msg.data = "left"
-                self.servo_publisher.publish(servo_msg)
-                self.get_logger().info("Servo moved left")
-            elif key == 'e':
-                servo_msg = String()
-                servo_msg.data = "right"
-                self.servo_publisher.publish(servo_msg)
-                self.get_logger().info("Servo moved right")
-            elif key == 'g':
-                self.set_mode("autonomous")
-            elif key == 'h':
-                self.set_mode("manual")
-            else:
-                self.twist.linear.x = 0.0
-                self.twist.angular.z = 0.0
+    def handle_keys(self):
 
+        try:
+            while self.running:
+                # Reset twist values to stop motion unless a key is pressed
+                self.twist.linear.x = 0.0
+                self.twist.angular.z = 0.0
+                move_message = String()
+
+                if keyboard.is_pressed('w'):  # Move forward
+                    self.twist.linear.x = self.speed
+                    self.twist.angular.z = 0.0
+                    self.get_logger().info(f"Move Forward: {self.speed}")
+                if keyboard.is_pressed('s'):  # Move backward
+                    self.twist.linear.x = -self.speed
+                    self.twist.angular.z = 0.0
+                    self.get_logger().info(f"Move Backward: {self.speed}")
+                if keyboard.is_pressed('a'):  # Turn left
+                    self.twist.linear.x = 0.0
+                    self.twist.angular.z = self.turn_speed
+                    self.get_logger().info(f"Turn Left: {self.speed}")
+                if keyboard.is_pressed('d'):  # Turn right
+                    self.twist.linear.x = 0.0
+                    self.twist.angular.z = -self.turn_speed
+                    self.get_logger().info(f"Turn Right: {self.speed}")
+
+                # Speed control
+                if keyboard.is_pressed('r'):  # Increase speed
+                    self.speed = min(255, self.speed + 0.01)
+                    self.turn_speed = min(255, self.turn_speed + 0.01)
+                    self.get_logger().info(f"Speed increased: {self.speed}")
+                if keyboard.is_pressed('f'):  # Decrease speed
+                    self.speed = max(0.0, self.speed - 0.01)
+                    self.turn_speed = max(0.0, self.turn_speed - 0.01)
+                    self.get_logger().info(f"Speed decreased: {self.speed}")
+
+                # Servo control
+                if keyboard.is_pressed('q'):
+                    servo_msg = String()
+                    servo_msg.data = "left"
+                    self.servo_publisher.publish(servo_msg)
+                    self.get_logger().info("Servo moved left")
+                if keyboard.is_pressed('e'):
+                    servo_msg = String()
+                    servo_msg.data = "right"
+                    self.servo_publisher.publish(servo_msg)
+                    self.get_logger().info("Servo moved right")
+
+                # Mode switch
+                if keyboard.is_pressed('g'):
+                    self.set_mode("autonomous")
+                if keyboard.is_pressed('h'):
+                    self.set_mode("manual")
+
+                # Stop all motion
+                if keyboard.is_pressed('space'):
+                    self.twist.linear.x = 0.0
+                    self.twist.angular.z = 0.0
+                    self.get_logger().info("STOP")
+
+            self.publisher.publish(self.twist)
+            time.sleep(0.1)
+        
+        except KeyboardInterrupt:
+            self.get_logger().info("Exiting teleoperation.")
+            self.running = False
+            self.twist.linear.x = 0.0
+            self.twist.angular.z = 0.0
             self.publisher.publish(self.twist)
 
     def main_loop(self):
@@ -98,7 +126,7 @@ class TeleopKeyboard(Node):
 def main(args=None):
     rclpy.init(args=args)
     node = TeleopKeyboard()
-    node.main_loop()
+    node.handle_keys()
     rclpy.shutdown()
 
 if __name__ == '__main__':
