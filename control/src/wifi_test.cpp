@@ -26,7 +26,6 @@ rcl_publisher_t publisher;
 std_msgs__msg__Int32 msg;
 rclc_support_t support;
 rcl_allocator_t allocator;
-rcl_node_t node;
 
 #if defined(LED_BUILTIN)
   #define LED_PIN LED_BUILTIN

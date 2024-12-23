@@ -17,5 +17,4 @@ class MechServo
         void tiltDown();
 };
 
-
 #endif

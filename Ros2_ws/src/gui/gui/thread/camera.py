@@ -17,14 +17,18 @@ class Camera(Node):
         self.timer = self.create_timer(0.01, self.timer_callback)
         self.cap = cv.VideoCapture(self.address)
         self.label = label
+        self.frame = None
 
     def timer_callback(self):    
-        ret, frame = self.cap.read()
+        ret, self.frame = self.cap.read()
         if ret:
-            try: 
-                self.label.setPixmap(QPixmap.fromImage(Utils.arrayToQImage(frame)))
+            try:
+                self.label.setPixmap(QPixmap.fromImage(Utils.arrayToQImage(self.frame)))
             except:
                 print(f"{self.name}: No connection trying to reconnect....")
                 print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
 
-        # self.get_logger().info(f'Reading {self.name} camera frames')     
+        # self.get_logger().info(f'Reading {self.name} camera frames')  
+         
+    def getCurrentFrame(self):
+        return self.frame     

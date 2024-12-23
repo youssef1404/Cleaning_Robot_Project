@@ -7,7 +7,7 @@ from rclpy.executors import MultiThreadedExecutor
 from PySide6.QtWidgets import QMainWindow, QApplication
 from PySide6.QtCore import *
 from PySide6.QtGui import *
-from ui.main_window import Ui_MainWindow as View
+from ui.main_window import Ui_MainWindow as View 
 
 # sys.path.append("/home/youssef/gui_ws/src/gui/gui/logic")
 from logic.RoverMain import Rover_Main 
