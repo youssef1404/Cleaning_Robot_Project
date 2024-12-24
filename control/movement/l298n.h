@@ -16,7 +16,7 @@ public:
     L298N(int enable_pin,int input1, int input2);
     void driver_init();
     void set_speed(int speed);
-    void set_direction(int direction);
+    void set_direction(int speed);
     void control_speed();
 };
 
