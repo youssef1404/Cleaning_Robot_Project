@@ -5,7 +5,9 @@
 #define OUTPUTLIMITS 20.0
 #define RESOLUTION 200.0
 #define TIME_FREQ 30
-#define dt 0.1
+#define dt 0.03
+
+#define integral_limit 20
 
 #define kp0 1
 #define kp1 0

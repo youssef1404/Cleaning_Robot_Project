@@ -32,8 +32,8 @@ Timer timer;
 
 
 //creating PID objects
-PIDController PID[]{PIDController(kp0, ki0, kd0, OUTPUTLIMITS, DEADZONE),
-                    PIDController(kp1, ki1, kd1, OUTPUTLIMITS, DEADZONE)};
+PIDController PID[]{PIDController(kp0, ki0, kd0, DEADZONE,dt),
+                    PIDController(kp1, ki1, kd1,DEADZONE,dt)};
 
 //creating Encoder objects
 eInterrupt Interrupt[]{eInterrupt(pin_A1, pin_B1, RESOLUTION),
