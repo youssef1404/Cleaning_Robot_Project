@@ -1,193 +1,181 @@
-#include <Arduino.h>
 #include <Timer.h>
+
 #include "Config.h"
 #include "pid_controller.h"
-#include "interrupt.h"
+#include "eInterrupt.h"
 #include "l298n.h"
 
-#include <micro_ros_platformio.h>
-
+#include <micro_ros_arduino.h>
 #include <rcl/rcl.h>
+#include <rcl/error_handling.h>
 #include <rclc/rclc.h>
 #include <rclc/executor.h>
 
-#include <std_msgs/msg/float32_multi__array.h>
-Timer timer;
-
+#include <std_msgs/msg/float32_multi_array.h>
 
 rclc_executor_t executor;
 rclc_support_t support;
 rcl_allocator_t allocator;
 rcl_node_t node;
-// rcl_timer_t timer;
 
-std_msgs__msg__Float32MultiArray encoder_speed;
-std_msgs__msg__Float32MultiArray counts;
-std_msgs__msg__Float32MultiArray pid_output;
-std_msgs__msg__Float32MultiArray pid_parameters;
+rcl_publisher_t pid_output_publisher;
+rcl_publisher_t speed_feedback_publisher;
+rcl_subscription_t speed_setpoint_subscriper;
+rcl_subscription_t pid_parameters_subscirper;
 
-rcl_publisher_t encoder_speed_publisher;
-rcl_publisher_t counts_publisher;
-rcl_publisher_t pid_publisher;
+std_msgs__msg__Float32MultiArray pid_output_msg;
+std_msgs__msg__Float32MultiArray speed_feedback_msg;
+std_msgs__msg__Float32MultiArray speed_setpoint_msg;
+std_msgs__msg__Float32MultiArray pid_parameters__msg;
 
-rcl_subscription_t SetPoint_subscriber;
-rcl_subscription_t parameters_subscriber;
+Timer timer;
 
-float counts_data[2];
-float setpoint[2];
-
-
-void set_setpoint(const std_msgs::Float32MultiArray &msg);
-void set_parameters(const std_msgs::Float32MultiArray& msg);
 
 //creating PID objects
-PIDController PID[]{PIDController(kp0,ki0,kd0,OUTPUTLIMITS,DEADZONE),
-                    PIDController(kp1,ki1,kd1,OUTPUTLIMITS,DEADZONE)};
+PIDController PID[]{PIDController(kp0, ki0, kd0, OUTPUTLIMITS, DEADZONE),
+                    PIDController(kp1, ki1, kd1, OUTPUTLIMITS, DEADZONE)};
 
 //creating Encoder objects
-Interrupt interrupt[]{Interrupt(pin_A1,pin_B1,RESOLUTION),
-                      Interrupt(pin_A2,pin_B2,RESOLUTION)};
+eInterrupt Interrupt[]{eInterrupt(pin_A1, pin_B1, RESOLUTION),
+                      eInterrupt(pin_A2, pin_B2, RESOLUTION)};
 
 //creating motor driver objects
-L298N l298n[]{
-             L298N(enable_pin_1,input1_1,input2_1),
-             L298N(enable_pin_2,input1_2,input2_2)
-};
+L298N l298n[]{L298N(enable_pin_1, input1_1, input2_1),
+              L298N(enable_pin_2, input1_2, input2_2)};
 
+float counts_data[] = {0,0};
+float setpoint[] = {0,0};
 float encoder_feedback[] = {0,0};
-float pid[] = {0,0};
+float pid_output[] = {0,0};
+float pid_parameters[] = {0,0,0,0,0,0};
 
 void setup(){
-    interrupt[0].Init();
-    interrupt[1].Init();
+  analogWriteResolution(16);
 
-    l298n[0].driver_init();
-    l298n[1].driver_init();
+  Interrupt[0].Init();
+  Interrupt[1].Init();
 
-    analogWriteResolution(16);
-    timer.every(TIME_FREQ, update_encoder);
+  l298n[0].driver_init();
+  l298n[1].driver_init();
 
-    attachInterrupt(digitalPinToInterrupt(interrupt[0].pin_A), Motor0_ISR_EncoderA, CHANGE);
-    attachInterrupt(digitalPinToInterrupt(interrupt[0].pin_B), Motor0_ISR_EncoderB, CHANGE);
-    attachInterrupt(digitalPinToInterrupt(interrupt[1].pin_A), Motor1_ISR_EncoderA, CHANGE);
-    attachInterrupt(digitalPinToInterrupt(interrupt[1].pin_B), Motor1_ISR_EncoderB, CHANGE);
+  set_microros_transports();
+  allocator = rcl_get_default_allocator();
+  rclc_support_init(&support, 0, NULL, &allocator);
+  rclc_node_init_default(&node, "movement", "", &support);
 
-    set_microros_transports();
-    rcl_allocator_t allocator = rcl_get_default_allocator();  // Use the default allocator
-    rclc_support_init(&support, 0, NULL, &allocator);  // Pass the allocator as a pointer
+  rclc_publisher_init_default(
+    &speed_feedback_publisher,
+    &node,
+    ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Float32MultiArray),
+    "speed_feedback");
 
-    rclc_publisher_init_default(&encoder_speed_publisher, &node, ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Float32MultiArray), "encoder_speed");
-    rclc_publisher_init_default(&counts_publisher, &node, ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Float32MultiArray), "counts");
-    rclc_publisher_init_default(&pid_publisher, &node, ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Float32MultiArray), "pid_pub");
+  rclc_publisher_init_default(
+    &pid_output_publisher,
+    &node,
+    ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Float32MultiArray),
+    "pid_output"); 
 
-    rclc_subscription_init_default(&SetPoint_subscriber, &node, ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Float32MultiArray), "Setpoint");
-    rclc_subscription_init_default(&parameters_subscriber, &node, ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Float32MultiArray), "Setparam");
+  rclc_subscription_init_default(
+    &speed_setpoint_subscriper,
+    &node,
+    ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Float32MultiArray),
+    "speed_setpoint");
 
-    rclc_executor_add_subscription(&executor, &SetPoint_subscriber, &setpoint, &setpointCallback, ON_NEW_DATA);
-    rclc_executor_add_subscription(&executor, &parameters_subscriber, &setParameters, &setParametersCallback, ON_NEW_DATA); 
+  rclc_subscription_init_default(
+    &pid_parameters_subscirper,
+    &node,
+    ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Float32MultiArray),
+    "pid_parameters");
 
-  // Set up length of arrays
-  speed_msg.data.data = encoder_feedback;
-  speed_msg.data.size = 2;
+  // speed_setpoint_msg.data.size = 2;
+  // pid_parameters__msg.data.size = 6;
   
-  counts_msg.data.data = counts_data;
-  counts_msg.data.size = 2;
+  rclc_executor_add_subscription(&executor, &speed_setpoint_subscriper, &speed_setpoint_msg, &speed_setpoint_callback, ON_NEW_DATA);
+  rclc_executor_add_subscription(&executor, &pid_parameters_subscirper, &pid_parameters__msg, &pid_parameters_callback, ON_NEW_DATA);
+  rclc_executor_init(&executor, &support.context, 1, &allocator);
 
-  pid_output_msg.data.data = pid;
-  pid_output_msg.data.size = 2;
+  timer.every(TIME_FREQ, update_encoder);
+
+  attachInterrupt(digitalPinToInterrupt(Interrupt[0].pin_A), Motor0_ISR_EncoderA, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(Interrupt[0].pin_B), Motor0_ISR_EncoderB, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(Interrupt[1].pin_A), Motor1_ISR_EncoderA, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(Interrupt[1].pin_B), Motor1_ISR_EncoderB, CHANGE);
 }
 
 void loop(){
   timer.update();
-
-
+  speed_controll();
+  publish_readings();
+  rclc_executor_spin_some(&executor, RCL_MS_TO_NS(10));
 }
 
 void update_encoder(){
-    encoder_feedback[0] = interrupt[0].calculate_speed();
-    encoder_feedback[1] = interrupt[1].calculate_speed();
+    encoder_feedback[0] = Interrupt[0].calculate_speed();
+    encoder_feedback[1] = Interrupt[1].calculate_speed();
 }
 
 void speed_controll(){
 
-    pid[0].setSetpoint(setpoint[0]);
-    pid[1].setSetpoint(setpoint[1]);
+    PID[0].setSetpoint(setpoint[0]);
+    PID[1].setSetpoint(setpoint[1]);
 
-    pid[0]=PID[0].calculateOutput(encoder_feedback[0]);
-    pid[1]=PID[1].calculateOutput(encoder_feedback[1]);
+    pid_output[0]=PID[0].calculateOutput(encoder_feedback[0]);
+    pid_output[1]=PID[1].calculateOutput(encoder_feedback[1]);
 
-    l298n[0].set_speed(pid[0]);
-    l298n[1].set_speed(pid[1]);
-    l298n[0].set_direction(pid[0]);
-    l298n[1].set_direction(pid[1]);
+    l298n[0].set_speed(pid_output[0]);
+    l298n[1].set_speed(pid_output[1]);
+    l298n[0].set_direction(pid_output[0]);
+    l298n[1].set_direction(pid_output[1]);
 
     l298n[0].control_speed();
     l298n[1].control_speed();
+}
 
+void publish_readings()
+{
+  pid_output_msg.data.size = 2;
+  speed_feedback_msg.data.size = 2;
+  pid_output_msg.data.data = pid_output;
+  speed_feedback_msg.data.data = encoder_feedback;
+  rcl_publish(&pid_output_publisher, &pid_output_msg, NULL);
+  rcl_publish(&speed_feedback_publisher, &speed_feedback_msg, NULL);
+}
 
-    speed_msg.data.data = encoder_feedback[0];
-    speed_msg.data.data[1] = encoder_feedback[1];
+void speed_setpoint_callback(const void *msgin)
+{
+  const std_msgs__msg__Float32MultiArray * msg = (const std_msgs__msg__Float32MultiArray *)msgin;
+  setpoint[0] = msg->data.data[0];
+  setpoint[1] = msg->data.data[1];
+}
 
+void pid_parameters_callback(const void *msgin)
+{
+  const std_msgs__msg__Float32MultiArray * msg = (const std_msgs__msg__Float32MultiArray *)msgin;
+  pid_parameters[0] = msg->data.data[0];
+  pid_parameters[1] = msg->data.data[1];
+  pid_parameters[2] = msg->data.data[2];
+  pid_parameters[3] = msg->data.data[3];
+  pid_parameters[4] = msg->data.data[4];
+  pid_parameters[5] = msg->data.data[5];
 
-    counts_msg.data.data[0] = interrupt[0].encoder_counts;
-    counts_msg.data.data[1] = interrupt[1].encoder_counts;
-
-
-   
-    pid_output_msg.data.data[0] = pid[0];
-    pid_output_msg.data.data[1] = pid[1];
-
-
-
-    publish_messages();
 }
 
 void Motor0_ISR_EncoderA()
 {
-  interrupt[0].ISR_A_routine();
+  Interrupt[0].ISR_A_routine();
 }
 
 void Motor0_ISR_EncoderB()
 {
-  interrupt[0].ISR_B_routine();
+  Interrupt[0].ISR_B_routine();
 }
 
 void Motor1_ISR_EncoderA()
 {
-  interrupt[1].ISR_A_routine();
+  Interrupt[1].ISR_A_routine();
 }
 
 void Motor1_ISR_EncoderB()
 {
-  interrupt[1].ISR_B_routine();
-}
-
-void set_parameters(const std_msgs::Float32MultiArray& msg) {
-      // Update PID parameters
-      PID[0].setParameters(msg.data[0], msg.data[1], msg.data[2]);
-      PID[1].setParameters(msg.data[3], msg.data[4], msg.data[5]);
-}
-
-void setpointCallback(const void *msg_in){
-  const std_msgs__msg__Float32MultiArray *msg = (const std_msgs__msg__Float32MultiArray *)msg_in;
-  
-    setpoint[0] = msg->data.data[i];
-    setpoint[1] = msg->data.data[i];
-  
-}
-
-void setParametersCallback(const void *msg_in){
-    const std_msgs__msg__Float32MultiArray *msg = (const std_msgs__msg__Float32MultiArray *)msg_in;
-    
-
-  pid[0].setParameters(msg->data.data[0], msg->data.data[1],  msg->data.data[2]);
-  pid[1].setParameters(msg->data.data[3], msg->data.data[4],  msg->data.data[5]);
-
-}
-
-
-void publish_messages(){
-    rcl_ret_t ret = rcl_publish(&encoder_speed_publisher, &speed_msg, NULL);
-    ret = rcl_publish(&counts_publisher, &counts_msg, NULL);
-    ret = rcl_publish(&pid_publisher , &pid_output_msg, NULL);
+  Interrupt[1].ISR_B_routine();
 }

@@ -1,46 +1,49 @@
 #include "pid_controller.h"
 
-PIDController::PIDController(double Kp, double Ki, double Kd, float outputLimits,float deadzone)
-    : _Kp(Kp), _Ki(Ki), _Kd(Kd),
-      _error(0.0), _integral(0.0), _lastError(0.0),
-      _setpoint(0.0), _outputLimits(outputLimits),
-      _deadzone(deadzone){}
+PIDController::PIDController(double kp, double ki, double kd, float outputLimits,float deadzone)
+    : kp(kp), ki(ki), kd(kd),
+      error(0.0), integral(0.0), lastError(0.0),
+      setpoint(0.0), outputLimits(outputLimits),
+      deadzone(deadzone){}
 
 float PIDController::calculateOutput(float measurement) {
-  _error = _setpoint - measurement;
+  this->error = this->setpoint - measurement;
 
   // DeadZone : Limit the error term
-  if (abs(_error) < _deadzone) { _error = 0.0; }
+  if (abs(this->error) < this->deadzone) { this->error = 0.0; }
 
   // Anti-windup: Limit the integral term
-  if (abs(_error) > _outputLimits) {
-      _integral -= _error * dt;
+  if (abs(this->error) > this->outputLimits) {
+      this->integral -= this->error * dt;
   } else {
-      _integral += _error * dt;
+      this->integral += this->error * dt;
   }
 
-  float derivative = (_error - _lastError) / dt;
-  _lastError = _error;
+  float derivative = (this->error - this->lastError) / dt;
+  this->lastError = this->error;
 
-  float output = _Kp * _error + _Ki * _integral + _Kd * derivative;
+  float output = this->kp * this->error + this->ki * this->integral + this->kd * derivative;
 
   // Saturate the output
-  if (output > _outputLimits) {
-      output = _outputLimits;
-  } else if (output < -_outputLimits) {
-      output = -_outputLimits;
+  if (output > this->outputLimits) {
+      output = this->outputLimits;
+  } else if (output < -this->outputLimits) {
+      output = -this->outputLimits;
   }
 
   return output;
 }
 
-void PIDController::setParameters(double Kp, double Ki, double Kd):_Kp(Kp), _Ki(Ki), _Kd(Kd) {
-
+void PIDController::setParameters(double kp, double ki, double kd){
+  this->kp = kp;
+  this->ki = ki;
+  this->kd = kd;
 }
+
 void PIDController::setSetpoint(float newSetpoint) {
-  _setpoint = newSetpoint;
+  this->setpoint = newSetpoint;
 }
 
 float PIDController::getSetpoint() const {
-  return _setpoint;
+  return this->setpoint;
 }

@@ -4,20 +4,21 @@
 #include <cmath>
 
 class PIDController {
-public:
-  PIDController(double Kp, double Ki, double Kd, float outputLimits,float deadzone);
-  float calculateOutput(float measurement);
-  void setSetpoint(float newSetpoint);
-  void setParameters(double Kp, double Ki, double Kd);
+  private:
+    float kp, ki, kd;
+    float error, integral, lastError;
+    float setpoint;
+    float outputLimits;
+    float deadzone;
 
-  float getSetpoint() const;
+  public:
+    PIDController(double Kp, double Ki, double Kd, float outputLimits,float deadzone);
+    float calculateOutput(float measurement);
+    void setSetpoint(float newSetpoint);
+    void setParameters(double Kp, double Ki, double Kd);
 
-private:
-  float _Kp, _Ki, _Kd;
-  float _error, _integral, _lastError;
-  float _setpoint;
-  float _outputLimits;
-  float _deadzone;
+    float getSetpoint() const;
+
 };
 
 #endif
