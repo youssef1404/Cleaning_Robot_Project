@@ -20,7 +20,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'keyboard_publisher = gui.keyboard:main'
+            'keyboard_publisher = gui.keyboard:main',
+            'guiNode = gui.main:main'
         ],
     },
 )

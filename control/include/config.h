@@ -9,7 +9,7 @@
 #define MOTOR_ENB 17
 
 #define RIGHT_MOTOR_ENCA 18
-#define RIGHT_MOTOR_ENCA 19
+#define RIGHT_MOTOR_ENCB 19
 
 #define SERVO_PIN 15
 #define UPPER_LIMIT 180

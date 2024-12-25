@@ -2,6 +2,8 @@
 #define DRIVER_H
 
 #include "config.h"
+#include <Arduino.h>
+
 
 // driverPins[0] = IN1 
 // driverPins[1] = IN2 
@@ -13,6 +15,17 @@
 /* Note: Invalid pins in esp32 = {
     0, 1, 3, 6, 7, 8, 9, 10, 11, 12, 15, 
 }*/
+
+#define MOTOR_IN1 12
+#define MOTOR_IN2 13
+#define MOTOR_IN3 14
+#define MOTOR_IN4 15
+#define MOTOR_ENA 16
+#define MOTOR_ENB 17
+
+#define MAX_SPEED 255
+#define MIN_SPEED 0
+#define DEFAULT_SPEED 50
 
 class MotorDriver
 {

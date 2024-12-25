@@ -14,7 +14,7 @@ class Rover
         MechServo servo;
         RosComm my_comm;
         MotorDriver driver;
-        void updateDistance();
+        // void updateDistance();
         void move();
         int keyValue;
     public:

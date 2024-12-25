@@ -2,8 +2,8 @@ package.xml
 setup.cfg
 setup.py
 gui/__init__.py
-gui/gui.py
 gui/keyboard.py
+gui/main.py
 gui/simple_subscriber.py
 gui.egg-info/PKG-INFO
 gui.egg-info/SOURCES.txt

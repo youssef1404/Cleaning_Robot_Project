@@ -2,7 +2,7 @@
 
 void Rover::setup(){
     Serial.begin(115200);
-    Serial.println("Hello world");
+    Serial.println("Hello Bor3y");
 
     // initialize communication 
     my_comm.initialize();

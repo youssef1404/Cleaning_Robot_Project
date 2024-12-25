@@ -7,14 +7,16 @@ from rclpy.executors import MultiThreadedExecutor
 from PySide6.QtWidgets import QMainWindow, QApplication
 from PySide6.QtCore import *
 from PySide6.QtGui import *
-from ui.main_window import Ui_MainWindow as View 
 
-# sys.path.append("/home/youssef/gui_ws/src/gui/gui/logic")
-from logic.RoverMain import Rover_Main 
+sys.path.append("src/gui/gui/ui")
+from main_window import Ui_MainWindow as View 
 
-# sys.path.append("src/gui/gui/src/utilss")
+sys.path.append("src/gui/gui/logic")
+from RoverMain import Rover_Main 
 
-from utilss.utils import Utils
+sys.path.append("src/gui/gui/utils")
+from utilss import Utils
+
 from threading import Thread
 
 class MyGUI(QMainWindow, View):
@@ -27,7 +29,6 @@ class MyGUI(QMainWindow, View):
         rclpy.init()
         self.executor = MultiThreadedExecutor()
         self.RoverMainTab = Rover_Main(executor = self.executor)
-
 
         self.tabWidget.addTab(self.RoverMainTab, "Main")
 

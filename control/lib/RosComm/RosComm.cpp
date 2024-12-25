@@ -42,8 +42,16 @@ RosComm::RosComm(): node_name("esp32"),
     this->my_sub = rcl_get_zero_initialized_subscription();
 }
 
+RosComm::~RosComm() {
+    destroy();
+}
+
 void RosComm::initialize(){
-    set_microros_wifi_transports(WIFI_SSID, WIFI_PASSWORD, AGENT_IP, AGENT_PORT);
+    set_microros_wifi_transports(WIFI_SSID, 
+								WIFI_PASSWORD, 
+								AGENT_IP, 
+								AGENT_PORT);
+
 
     pinMode(LED_PIN, OUTPUT);
     digitalWrite(LED_PIN, HIGH);
@@ -84,11 +92,13 @@ bool RosComm::create_entities(){
 
     // create timer,
 	const unsigned int timer_timeout = 100;
-	rclc_timer_init_default(
-		&this->timer,
-		&this->support,
-		RCL_MS_TO_NS(timer_timeout),
-		RosComm::timer_callback);
+
+	RCCHECK(rclc_timer_init_default2(&timer, 
+									&support, 
+									RCL_MS_TO_NS(1000), 
+									timer_callback, 
+									true));
+
 
     rclc_executor_init(&this->executor, &this->support.context, 2, &this->allocator);
 	rclc_executor_add_subscription(&this->executor, &this->my_sub, &RosComm::key_msg, RosComm::my_subscriber_callback, ON_NEW_DATA);
@@ -162,6 +172,7 @@ void RosComm::loop()
     updateUltraMsg();
 }
 
+// Cleans up all ROS 2 entities and finalizes messages.
 void RosComm::destroy()
 {
 	rmw_context_t *rmw_context = rcl_context_get_rmw_context(&support.context);

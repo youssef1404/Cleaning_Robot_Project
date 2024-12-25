@@ -18,9 +18,11 @@
 #include <std_msgs/msg/float32.h>
 #include <std_msgs/msg/string.h>
 
-#if !defined(ESP32) && !defined(TARGET_PORTENTA_H7_M7) && !defined(ARDUINO_GIGA) && !defined(ARDUINO_NANO_RP2040_CONNECT) && !defined(ARDUINO_WIO_TERMINAL) && !defined(ARDUINO_UNOR4_WIFI) && !defined(ARDUINO_OPTA)
-#error This example is only available for Arduino Portenta, Arduino Giga R1, Arduino Nano RP2040 Connect, ESP32 Dev module, Wio Terminal, Arduino Uno R4 WiFi and Arduino OPTA WiFi 
-#endif
+// Wi-Fi credentials
+#define WIFI_SSID "Honor 50"       
+#define WIFI_PASSWORD "12345678" 
+#define AGENT_IP "192.168.153.203"           
+#define AGENT_PORT 8888 
 
 #if defined(LED_BUILTIN)
   #define LED_PIN LED_BUILTIN
@@ -35,10 +37,10 @@ extern char ssid[];
 extern char psk[];
 
 enum States {
-	WAITING_AGENT,
-	AGENT_AVAILABLE,
-	AGENT_CONNECTED,
-	AGENT_DISCONNECTED
+WAITING_AGENT, // Pings the agent.
+AGENT_AVAILABLE, // Creates ROS 2 entities.
+AGENT_CONNECTED, // Spins the executor.
+AGENT_DISCONNECTED // Cleans up and resets.
 };
 
 class RosComm
@@ -84,6 +86,7 @@ class RosComm
         static std_msgs__msg__Float32 ultra_msg;
 
         RosComm();
+        ~RosComm();
         void initialize();
         void loop();
         void printWifiData();

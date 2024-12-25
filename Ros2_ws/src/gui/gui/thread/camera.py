@@ -7,7 +7,10 @@ from cv_bridge import CvBridge, CvBridgeError
 import cv2 as cv
 from PySide6.QtCore import *
 from PySide6.QtGui import *
-from utilss.utils import Utils
+import sys
+
+sys.path.append("src/gui/gui/utils")
+from utilss import Utils
 
 class Camera(Node):
     def __init__(self, name, address, label):
@@ -29,6 +32,6 @@ class Camera(Node):
                 print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
 
         # self.get_logger().info(f'Reading {self.name} camera frames')  
-         
+
     def getCurrentFrame(self):
         return self.frame     
