@@ -1,21 +1,22 @@
 #include "l298n.h"
 
-L298N::L298N(int enable_pin, int input1, int input2):speed(0),direction(0){
-    this-> enable_pin = enable_pin;
+
+L298N::L298N(uint8_t enable_pin ,uint8_t input1, uint8_t input2):speed(0),direction(0){
+    this->enable_pin = enable_pin;
     this->input1 = input1;
     this->input2 = input2;
 }
-void driver_init(){
-    pinMode(enable_pin, OUTPUT);
+void L298N::driver_init(){
+    pinMode(enable_pin,OUTPUT);
     pinMode(input1, OUTPUT);
     pinMode(input2, OUTPUT);
 
 }
-void set_speed(int speed){
+void L298N::set_speed(int speed){
     this->speed = abs(speed);
 }
 
-void set_direction(int speed){
+void L298N::set_direction(int speed){
     if (speed > 0)
         this->direction = 1; //forward
     else if (speed<0)
@@ -24,7 +25,7 @@ void set_direction(int speed){
         this->direction = 0; //stop
 }
 
-void control_speed(){
+void L298N::control_speed(){
     if (this->direction == 1) {
         digitalWrite(input1, HIGH);
         digitalWrite(input2, LOW);
@@ -32,10 +33,10 @@ void control_speed(){
     } else if (this->direction == -1) {
         digitalWrite(input1, LOW);
         digitalWrite(input2, HIGH);
-        analogWrite(enablePin, this->speed);
+        analogWrite(enable_pin, this->speed);
     } else {
         digitalWrite(input1, LOW);
         digitalWrite(input2, LOW);
-        analogWrite(enablePin, 0);
+        analogWrite(enable_pin, 0);
     }
 }

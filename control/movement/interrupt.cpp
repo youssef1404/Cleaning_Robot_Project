@@ -1,17 +1,30 @@
 #include "interrupt.h"
 
-Interrupt::Interrupt(unit8_t pin_A, unit8_t pin_B, void(*ISR_A)(), void(*ISR_B)()):Encoder(resoultion)
+
+Interrupt::Interrupt(uint8_t pin_A, uint8_t pin_B,float resoultion)
+{
     this->pin_A = pin_A;
     this->pin_B = pin_B;
-    isrA(ISR_A),isrB(ISR_B){}
+    this->resoultion = resoultion;
+}
+
+
+float Interrupt::calculate_speed(){
+    float current_time = millis();
+    long new_counts = encoder_counts;
+    int delta_counts = new_counts - prev_counts;
+    float DT = current_time - prev_time;
+    float speed = (seconds * milles/ resoultion)*(delta_counts/DT);
+    prev_counts = new_counts;
+    prev_time = current_time;
+    return speed;
+}
 
 
 void Interrupt::Init(){
   pinMode(pin_A, INPUT_PULLUP);
   pinMode(pin_B, INPUT_PULLUP);
 
-  attachInterrupt(digitalPinToInterrupt(pin_A), isrA, CHANGE);
-  attachInterrupt(digitalPinToInterrupt(pin_B), isrB, CHANGE);
 }
 
 void Interrupt::ISR_A_routine(){

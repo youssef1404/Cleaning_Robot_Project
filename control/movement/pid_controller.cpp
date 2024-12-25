@@ -6,7 +6,7 @@ PIDController::PIDController(double Kp, double Ki, double Kd, float outputLimits
       _setpoint(0.0), _outputLimits(outputLimits),
       _deadzone(deadzone){}
 
-float PIDController::calculateOutput(float measurement, float dt) {
+float PIDController::calculateOutput(float measurement) {
   _error = _setpoint - measurement;
 
   // DeadZone : Limit the error term
@@ -34,6 +34,9 @@ float PIDController::calculateOutput(float measurement, float dt) {
   return output;
 }
 
+void PIDController::setParameters(double Kp, double Ki, double Kd):_Kp(Kp), _Ki(Ki), _Kd(Kd) {
+
+}
 void PIDController::setSetpoint(float newSetpoint) {
   _setpoint = newSetpoint;
 }
