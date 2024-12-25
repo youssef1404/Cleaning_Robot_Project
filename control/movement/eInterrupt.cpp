@@ -1,5 +1,4 @@
 #include "eInterrupt.h"
-#include <Arduino.h>
 
 eInterrupt::eInterrupt(int pin_A, int pin_B, float resoultion) {
   this->pin_A = pin_A;

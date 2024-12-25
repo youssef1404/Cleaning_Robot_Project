@@ -1,6 +1,5 @@
 #include <sys/_stdint.h>
 #include "l298n.h"
-#include <Arduino.h>
 
 L298N::L298N(uint8_t enable_pin ,uint8_t input1, uint8_t input2):speed(0), direction(0) {
   this->enable_pin = enable_pin;

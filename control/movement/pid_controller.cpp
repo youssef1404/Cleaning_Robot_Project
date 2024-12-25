@@ -1,32 +1,38 @@
 #include "pid_controller.h"
 
-
-PIDController::PIDController(float kp, float ki, float kd,float deadzone, float sample_time)
+PIDController::PIDController(float kp, float ki, float kd, float outputLimits,float deadzone)
     : kp(kp), ki(ki), kd(kd),
-      error(0.0), integral(0.0), derivative(0),
-      setpoint(0.0),
-      deadzone(deadzone),sample_time(sample_time),last_error(0),output(0){}
-
-
-
+      error(0.0), integral(0.0), lastError(0.0),
+      setpoint(0.0), outputLimits(outputLimits),
+      deadzone(deadzone){}
 
 float PIDController::calculateOutput(float measurement) {
+  this->error = this->setpoint - measurement;
 
+  // DeadZone : Limit the error term
+  if (abs(this->error) < this->deadzone) { this->error = 0.0; }
 
-  error = setpoint - measurement;
-
-  integral += ki*(error * sample_time);
-  integral = constrain(integral, integral_limit, -integral_limit);
-  derivative = kd * (error - last_error)/sample_time;
-  output = kp * error + integral + derivative;
-  last_error = error;
-  if((abs(setpoint - measurement) < deadzone) && (0 == setpoint)){
-    output = 0;
-    integral = 0;
+  // Anti-windup: Limit the integral term
+  if (abs(this->error) > this->outputLimits) {
+      this->integral -= this->error * dt;
+  } else {
+      this->integral += this->error * dt;
   }
+
+  float derivative = (this->error - this->lastError) / dt;
+  this->lastError = this->error;
+
+  float output = this->kp * this->error + this->ki * this->integral + this->kd * derivative;
+
+  // Saturate the output
+  if (output > this->outputLimits) {
+      output = this->outputLimits;
+  } else if (output < -this->outputLimits) {
+      output = -this->outputLimits;
+  }
+
   return output;
 }
-
 
 void PIDController::setParameters(float kp, float ki, float kd){
   this->kp = kp;
@@ -34,10 +40,10 @@ void PIDController::setParameters(float kp, float ki, float kd){
   this->kd = kd;
 }
 
-
-
 void PIDController::setSetpoint(float newSetpoint) {
   this->setpoint = newSetpoint;
 }
 
-
+float PIDController::getSetpoint() const {
+  return this->setpoint;
+}

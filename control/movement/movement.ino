@@ -20,20 +20,21 @@ rcl_node_t node;
 
 rcl_publisher_t pid_output_publisher;
 rcl_publisher_t speed_feedback_publisher;
+rcl_publisher_t counts_publisher;
 rcl_subscription_t speed_setpoint_subscriper;
 rcl_subscription_t pid_parameters_subscirper;
 
 std_msgs__msg__Float32MultiArray pid_output_msg;
 std_msgs__msg__Float32MultiArray speed_feedback_msg;
+std_msgs__msg__Float32MultiArray counts_msg;
 std_msgs__msg__Float32MultiArray speed_setpoint_msg;
 std_msgs__msg__Float32MultiArray pid_parameters__msg;
 
 Timer timer;
 
-
 //creating PID objects
-PIDController PID[]{PIDController(kp0, ki0, kd0, DEADZONE,dt),
-                    PIDController(kp1, ki1, kd1,DEADZONE,dt)};
+PIDController PID[]{PIDController(kp0, ki0, kd0, OUTPUTLIMITS, DEADZONE),
+                    PIDController(kp1, ki1, kd1, OUTPUTLIMITS, DEADZONE)};
 
 //creating Encoder objects
 eInterrupt Interrupt[]{eInterrupt(pin_A1, pin_B1, RESOLUTION),
@@ -44,8 +45,8 @@ L298N l298n[]{L298N(enable_pin_1, input1_1, input2_1),
               L298N(enable_pin_2, input1_2, input2_2)};
 
 float counts_data[] = {0,0};
-float setpoint[] = {0,0};
-float encoder_feedback[] = {0,0};
+float setpoint[] = {1,1};
+float speed_feedback[] = {0,0};
 float pid_output[] = {0,0};
 float pid_parameters[] = {0,0,0,0,0,0};
 
@@ -75,6 +76,12 @@ void setup(){
     ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Float32MultiArray),
     "pid_output"); 
 
+  rclc_publisher_init_default(
+    &counts_publisher,
+    &node,
+    ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Float32MultiArray),
+    "counts"); 
+
   rclc_subscription_init_default(
     &speed_setpoint_subscriper,
     &node,
@@ -87,12 +94,15 @@ void setup(){
     ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Float32MultiArray),
     "pid_parameters");
 
-  // speed_setpoint_msg.data.size = 2;
-  // pid_parameters__msg.data.size = 6;
-  
+  speed_setpoint_msg.data.capacity = 2;
+  pid_parameters__msg.data.capacity = 6;
+
+  speed_setpoint_msg.data.data = (float_t*) malloc(speed_setpoint_msg.data.capacity * sizeof(float_t));
+  pid_parameters__msg.data.data = (float_t*) malloc(pid_parameters__msg.data.capacity * sizeof(float_t));
+
+  rclc_executor_init(&executor, &support.context, 1, &allocator);
   rclc_executor_add_subscription(&executor, &speed_setpoint_subscriper, &speed_setpoint_msg, &speed_setpoint_callback, ON_NEW_DATA);
   rclc_executor_add_subscription(&executor, &pid_parameters_subscirper, &pid_parameters__msg, &pid_parameters_callback, ON_NEW_DATA);
-  rclc_executor_init(&executor, &support.context, 1, &allocator);
 
   timer.every(TIME_FREQ, update_encoder);
 
@@ -106,39 +116,44 @@ void loop(){
   timer.update();
   speed_controll();
   publish_readings();
-  rclc_executor_spin_some(&executor, RCL_MS_TO_NS(10));
+  delay(20);
+  rclc_executor_spin_some(&executor, RCL_MS_TO_NS(20));
 }
 
 void update_encoder(){
-    encoder_feedback[0] = Interrupt[0].calculate_speed();
-    encoder_feedback[1] = Interrupt[1].calculate_speed();
+  counts_data[0] = Interrupt[0].encoder_counts;
+  counts_data[1] = Interrupt[1].encoder_counts;
+  speed_feedback[0] = Interrupt[0].calculate_speed();
+  speed_feedback[1] = Interrupt[1].calculate_speed();
 }
 
 void speed_controll(){
+  PID[0].setSetpoint(setpoint[0]);
+  PID[1].setSetpoint(setpoint[1]);
 
-    PID[0].setSetpoint(setpoint[0]);
-    PID[1].setSetpoint(setpoint[1]);
+  pid_output[0] = PID[0].calculateOutput(speed_feedback[0]);
+  pid_output[1] = PID[1].calculateOutput(speed_feedback[1]);
 
-    pid_output[0]=PID[0].calculateOutput(encoder_feedback[0]);
-    pid_output[1]=PID[1].calculateOutput(encoder_feedback[1]);
+  l298n[0].set_speed(pid_output[0]);
+  l298n[1].set_speed(pid_output[1]);
+  l298n[0].set_direction(pid_output[0]);
+  l298n[1].set_direction(pid_output[1]);
 
-    l298n[0].set_speed(pid_output[0]);
-    l298n[1].set_speed(pid_output[1]);
-    l298n[0].set_direction(pid_output[0]);
-    l298n[1].set_direction(pid_output[1]);
-
-    l298n[0].control_speed();
-    l298n[1].control_speed();
+  l298n[0].control_speed();
+  l298n[1].control_speed();
 }
 
 void publish_readings()
 {
   pid_output_msg.data.size = 2;
   speed_feedback_msg.data.size = 2;
+  counts_msg.data.size = 2;
   pid_output_msg.data.data = pid_output;
-  speed_feedback_msg.data.data = encoder_feedback;
+  speed_feedback_msg.data.data = speed_feedback;
+  counts_msg.data.data = counts_data;
   rcl_publish(&pid_output_publisher, &pid_output_msg, NULL);
   rcl_publish(&speed_feedback_publisher, &speed_feedback_msg, NULL);
+  rcl_publish(&counts_publisher, &counts_msg, NULL);
 }
 
 void speed_setpoint_callback(const void *msgin)

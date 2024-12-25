@@ -1,5 +1,6 @@
 #ifndef L298N_H
 #define L298N_H
+#include <Arduino.h>
 
 class L298N {
   private:

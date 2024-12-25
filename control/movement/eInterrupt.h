@@ -1,5 +1,6 @@
 #ifndef eInterrupt_H
 #define eInterrupt_H
+#include <Arduino.h>
 
 #define secondes_per_minute 60
 #define milles 1000
