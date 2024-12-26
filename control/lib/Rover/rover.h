@@ -5,8 +5,6 @@
 #include "mechServo.h"
 #include "driver.h"
 #include "ultrasonic.h"
-#include "encoder.h"
-
 
 class Rover
 {

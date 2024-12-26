@@ -17,7 +17,9 @@ void Rover::setup(){
 void Rover::loop(){
     my_comm.loop();
     this->keyValue = my_comm.getkeyboardValue();
-    this->move();
+    // Serial.println("keyboard value: ");
+    // Serial.println(this->keyValue);
+    // this->move();
 }
 
 void Rover::move(){

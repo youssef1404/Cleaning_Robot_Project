@@ -13,7 +13,8 @@
 #include <std_msgs/msg/int16_multi_array.h>
 #include <std_msgs/msg/float32_multi_array.h>
 
-#include <std_msgs/msg/int16.h>
+
+#include <std_msgs/msg/int8.h>
 #include <std_msgs/msg/int32.h>
 #include <std_msgs/msg/float32.h>
 #include <std_msgs/msg/string.h>
@@ -21,7 +22,7 @@
 // Wi-Fi credentials
 #define WIFI_SSID "Honor 50"       
 #define WIFI_PASSWORD "12345678" 
-#define AGENT_IP "192.168.153.203"           
+#define AGENT_IP "192.168.5.203"           
 #define AGENT_PORT 8888 
 
 #if defined(LED_BUILTIN)
@@ -63,38 +64,36 @@ class RosComm
         rcl_timer_t timer;
 
         // publishers
-        static rcl_publisher_t ultra_pub; // ultrasonic data
-        const char *ultra_topic_name;
-        static rcl_publisher_t motor_feed_pub; 
-        const char *motor_feed_topic_name;
+        // static rcl_publisher_t ultra_pub; // ultrasonic data
+        // const char *ultra_topic_name;
+        // static rcl_publisher_t motor_feed_pub; 
+        // const char *motor_feed_topic_name;
 
         // subscirbers
         rcl_subscription_t my_sub;
         const char *motion_topic_name;
 
-        static void timer_callback(rcl_timer_t * timer, int64_t last_call_time);
+        // static void timer_callback(rcl_timer_t * timer, int64_t last_call_time);
         static void my_subscriber_callback(const void * msgin);
         void destroy();
         bool create_entities();
 
         float distance;
-        int keyVal;
+        int8_t keyVal;
 
     public:
         bool sub_new_data;
-        static std_msgs__msg__Int32 key_msg;
-        static std_msgs__msg__Float32 ultra_msg;
+        static std_msgs__msg__Int8* key_msg;
+        // static std_msgs__msg__Float32* ultra_msg;
 
         RosComm();
-        ~RosComm();
-        void initialize();
+        bool initialize();
         void loop();
-        void printWifiData();
-        void printCurrentNet();
-        void updateUltraMsg();
-        float getDistance();
+        // void updateUltraMsg();
+        // float getDistance();
         void updateKeyboardValue();
-        int getkeyboardValue();
+        int8_t getkeyboardValue();
+        void printWifiStatus();
 };
 
 #endif

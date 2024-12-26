@@ -7,6 +7,6 @@ void setup() {
 }
 
 void loop() {
-	Serial.println("loop");
+	// Serial.println("loop");
 	Bor3y.loop();
 }
