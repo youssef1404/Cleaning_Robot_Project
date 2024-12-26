@@ -1,4 +1,3 @@
-#define __STM32F1__
 #include <Timer.h>
 
 #include "Config.h"
@@ -49,10 +48,10 @@ float counts_data[] = {0,0};
 float setpoint[] = {1,1};
 float speed_feedback[] = {0,0};
 float pid_output[] = {0,0};
-float pid_parameters[] = {0,0,0,0,0,0};
+float pid_parameters[] = {kp0,ki0,kd0,kp1,ki1,kd1};
 
 void setup(){
-  // analogWriteResolution(16);
+  analogWriteResolution(16);
 
   Interrupt[0].Init();
   Interrupt[1].Init();
@@ -99,9 +98,9 @@ void setup(){
   pid_parameters__msg.data.capacity = 6;
 
   speed_setpoint_msg.data.data = (float_t*) malloc(speed_setpoint_msg.data.capacity * sizeof(float_t));
-  pid_parameters__msg.data.data = (float_t*) malloc(pid_parameters__msg.data.capacity * sizeof(float_t));
+  pid_parameters__msg.data.data = (float_t*) malloc(speed_setpoint_msg.data.capacity * sizeof(float_t));
 
-  rclc_executor_init(&executor, &support.context, 1, &allocator);
+  rclc_executor_init(&executor, &support.context, 2, &allocator);
   rclc_executor_add_subscription(&executor, &speed_setpoint_subscriper, &speed_setpoint_msg, &speed_setpoint_callback, ON_NEW_DATA);
   rclc_executor_add_subscription(&executor, &pid_parameters_subscirper, &pid_parameters__msg, &pid_parameters_callback, ON_NEW_DATA);
 
@@ -129,6 +128,9 @@ void update_encoder(){
 }
 
 void speed_controll(){
+  PID[0].setParameters(pid_parameters[0], pid_parameters[1], pid_parameters[2]);
+  PID[1].setParameters(pid_parameters[3], pid_parameters[4], pid_parameters[5]);
+
   PID[0].setSetpoint(setpoint[0]);
   PID[1].setSetpoint(setpoint[1]);
 
@@ -149,6 +151,7 @@ void publish_readings()
   pid_output_msg.data.size = 2;
   speed_feedback_msg.data.size = 2;
   counts_msg.data.size = 2;
+
   pid_output_msg.data.data = pid_output;
   speed_feedback_msg.data.data = speed_feedback;
   counts_msg.data.data = counts_data;
@@ -173,7 +176,6 @@ void pid_parameters_callback(const void *msgin)
   pid_parameters[3] = msg->data.data[3];
   pid_parameters[4] = msg->data.data[4];
   pid_parameters[5] = msg->data.data[5];
-
 }
 
 void Motor0_ISR_EncoderA()

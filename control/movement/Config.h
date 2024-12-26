@@ -8,25 +8,25 @@
 #define dt 0.1
 
 #define kp0 1
-#define kp1 0
+#define kp1 1
 
 #define ki0 1
-#define ki1 0
+#define ki1 1
 
 #define kd0 1
-#define kd1 0
+#define kd1 1
 
-#define pin_A1  PB6 // 36
-#define pin_A2 PB7 //34
+#define pin_A1 PB6
+#define pin_A2 PB7
 
-#define pin_B1 PA3 // 39
-#define pin_B2 PA2   //35
+#define pin_B1 PA3
+#define pin_B2 PA2
 
-#define enable_pin_1 PB0   //23
-#define enable_pin_2 PA7    //22
-#define input1_1  PA6     //21
-#define input1_2  PB7    //19
-#define input2_1  PB13   //18
-#define input2_2  PB12 //5
+#define enable_pin_1 PB0
+#define enable_pin_2 PA7
+#define input1_1 PA6
+#define input1_2 PB7
+#define input2_1 PB13
+#define input2_2 PB12
 
 #endif
