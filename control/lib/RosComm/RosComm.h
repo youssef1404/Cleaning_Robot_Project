@@ -1,58 +1,65 @@
-#ifndef _ROSCOMM_H_
-#define _ROSCOMM_H_
+#ifndef ROSCOMM_H
+#define ROSCOMM_H
 
-#include <micro_ros_platformio.h>
 #include <micro_ros_arduino.h>
-#include <Arduino.h>
-#include <IPAddress.h>
-#include "ros_config.h"
-#include "ros_types.h"
+#include <stdio.h>
+#include <rcl/rcl.h>
+#include <rcl/error_handling.h>
+#include <rclc/rclc.h>
+#include <rclc/executor.h>
+#include <std_msgs/msg/int8.h>
+#include <WiFi.h>
+
+#define LED_PIN 2
+#define WIFI_SSID "YOUR_SSID"
+#define WIFI_PASSWORD "YOUR_PASSWORD"
+#define AGENT_IP "192.168.1.18"
+#define AGENT_PORT 8888
 
 class RosComm
 {
+public:
+    RosComm();
+    bool initialize();
+    void loop();
+    int8_t getkeyboardValue();
+    void printWifiStatus();
+
 private:
-    // Network configuration
-    NetworkConfig network_config;
+    enum CommState
+    {
+        WAITING_AGENT,
+        AGENT_AVAILABLE,
+        AGENT_CONNECTED,
+        AGENT_DISCONNECTED
+    };
 
-    // ROS entities
-    RosEntities entities;
-
-    // State management
-    States state;
-
-    // Data storage
-    float distance;
-    int keyVal;
-
-    // Internal methods
     bool create_entities();
     void destroy();
-    static void timer_callback(rcl_timer_t *timer, int64_t last_call_time);
-    static void subscriber_callback(const void *msgin);
-
-public:
-    // Static message holders
-    static std_msgs__msg__Int32 key_msg;
-    static std_msgs__msg__Float32 ultra_msg;
-    static rcl_publisher_t ultra_pub;
-    static rcl_publisher_t motor_feed_pub;
-
-    bool sub_new_data;
-
-    RosComm();
-    void initialize();
-    void loop();
-
-    // Utility methods
-    void printWifiData();
-    void printCurrentNet();
-
-    // Data access methods
-    void updateUltraMsg();
-    float getDistance() const { return distance; }
     void updateKeyboardValue();
-    int getKeyboardValue() const { return keyVal; }
-    States getState() const { return state; }
+    bool setupWiFiConnection();
+    static void my_subscriber_callback(const void *msgin);
+
+    const char *node_name;
+    const char *motion_topic_name;
+    IPAddress agent_ip;
+    uint16_t agent_port;
+    const char *ssid;
+    const char *psk;
+    int8_t keyVal;
+
+    rcl_subscription_t my_sub;
+    rclc_support_t support;
+    rcl_allocator_t allocator;
+    rcl_node_t node;
+    rclc_executor_t executor;
+    CommState state;
+
+    static std_msgs__msg__Int8 *key_msg;
+
+    // Connection management
+    int connection_attempts;
+    unsigned long last_reconnect_attempt;
 };
 
-#endif
+#endif // ROSCOMM_H
