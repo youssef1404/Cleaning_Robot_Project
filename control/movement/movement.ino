@@ -1,3 +1,4 @@
+#define __STM32F1__
 #include <Timer.h>
 
 #include "Config.h"

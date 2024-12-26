@@ -16,17 +16,17 @@
 #define kd0 1
 #define kd1 0
 
-#define pin_A1 36  //PB6
-#define pin_A2 34 //PB7
+#define pin_A1  PB6 // 36
+#define pin_A2 PB7 //34
 
-#define pin_B1  39// PA3
-#define pin_B2 35  //PA2
+#define pin_B1 PA3 // 39
+#define pin_B2 PA2   //35
 
-#define enable_pin_1 23  //PB0
-#define enable_pin_2 22  //PA7
-#define input1_1 21  //PA6
-#define input1_2 19  //PB7
-#define input2_1  18 //PB13
-#define input2_2  5//PB12
+#define enable_pin_1 PB0   //23
+#define enable_pin_2 PA7    //22
+#define input1_1  PA6     //21
+#define input1_2  PB7    //19
+#define input2_1  PB13   //18
+#define input2_2  PB12 //5
 
 #endif
