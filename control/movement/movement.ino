@@ -51,7 +51,7 @@ float pid_output[] = {0,0};
 float pid_parameters[] = {0,0,0,0,0,0};
 
 void setup(){
-  analogWriteResolution(16);
+  // analogWriteResolution(16);
 
   Interrupt[0].Init();
   Interrupt[1].Init();
