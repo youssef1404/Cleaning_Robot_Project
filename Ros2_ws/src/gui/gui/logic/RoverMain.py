@@ -19,9 +19,12 @@ from camera import Camera
 from timer import Timer
 from communication import Comsystem
 
+
 from rclpy.executors import MultiThreadedExecutor
 from PyQt5.QtGui import QImage, QPixmap
 import cv2 as cv
+
+
 
 address = "http://192.168.0.102:8080/video"
 

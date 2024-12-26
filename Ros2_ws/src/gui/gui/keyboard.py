@@ -50,7 +50,7 @@ def main(args=None):
             key = get_key()
 
             # Map keys to specific integers
-            key_mapping = {'w': 1, 's': 2, 'd': 3, 'a': 4, ' ': 5, 'b': 6, 'n':7}
+            key_mapping = {'w': 1, 's': 2, 'd': 3, 'a': 4}
             if key == '\x03':  # CTRL+C to exit
                 break
 

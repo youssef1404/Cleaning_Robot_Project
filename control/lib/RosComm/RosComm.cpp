@@ -61,6 +61,19 @@ bool RosComm::initialize() {
 
 
 
+    // RosComm::ultra_msg = std_msgs__msg__Float32__create();
+    // if (RosComm::ultra_msg == NULL) {
+    //     Serial.println("Failed to create ultra_msg");
+    //     if (RosComm::key_msg != NULL) {
+    //         std_msgs__msg__Int8__destroy(RosComm::key_msg);
+    //         RosComm::key_msg = NULL;
+    //     }
+    //     return false;
+    // }
+
+
+   	// Serial.println("Initializing message data...");
+
     // RosComm::ultra_msg->data = 0.0f;
 
     Serial.println("Setting up LED...");
@@ -121,13 +134,14 @@ bool RosComm::create_entities() {
 
     // Initialize message structures with checks
     Serial.println("Creating message structures...");
-    RosComm::key_msg = (std_msgs__msg__Int8*)malloc(sizeof(std_msgs__msg__Int8));
+    RosComm::key_msg = std_msgs__msg__Int8__create();
     if (RosComm::key_msg == NULL) {
         Serial.println("Failed to create key_msg");
         return false;
     }
-    Serial.println("Initializing message data...");
+    RosComm::key_msg = (std_msgs__msg__Int8*)malloc(sizeof(std_msgs__msg__Int8));
     RosComm::key_msg->data = 0;
+
 
 
     if (RCL_RET_OK != rclc_executor_init(&this->executor, &this->support.context, 2, &this->allocator)) {
@@ -170,10 +184,10 @@ void RosComm::my_subscriber_callback(const void *msgin) {
         return;
     }
     
-    if (RosComm::key_msg == NULL) {
-        Serial.println("Error: key_msg is NULL");
-        return;
-    }
+    // if (RosComm::key_msg == NULL) {
+    //     Serial.println("Error: key_msg is NULL");
+    //     return;
+    // }
 
     const std_msgs__msg__Int8* msg = (const std_msgs__msg__Int8*)msgin;
     Serial.printf("Received message data: %d\n", msg->data);
@@ -185,10 +199,10 @@ void RosComm::loop() {
     unsigned long now = millis();
     
     // Print state every second
-    if (now - lastPrint >= 1000) {
-        Serial.printf("Current state: %d, Free heap: %d\n", state, ESP.getFreeHeap());
-        lastPrint = now;
-    }
+    // if (now - lastPrint >= 1000) {
+    //     Serial.printf("Current state: %d, Free heap: %d\n", state, ESP.getFreeHeap());
+    //     lastPrint = now;
+    // }
 
     // Add null checks before state machine
     if (RosComm::key_msg == NULL ) {
@@ -222,17 +236,15 @@ void RosComm::loop() {
 
     case AGENT_CONNECTED:
         EXECUTE_EVERY_N_MS(200, {
-            bool ping_ok = (RMW_RET_OK == rmw_uros_ping_agent(500, 1));
+            bool ping_ok = (RMW_RET_OK == rmw_uros_ping_agent(100, 1));
             if (!ping_ok) {
                 Serial.println("Lost connection to agent");
                 state = AGENT_DISCONNECTED;
             }
         });
-        if (state == AGENT_CONNECTED)
-        {
-            rclc_executor_spin_some(&this->executor, RCL_MS_TO_NS(100));
-        }
-    
+        Serial.println("Spinning executor...");
+        rclc_executor_spin_some(&this->executor, RCL_MS_TO_NS(100));
+        
         break;
 
     case AGENT_DISCONNECTED:
@@ -241,6 +253,13 @@ void RosComm::loop() {
         state = WAITING_AGENT;
         break;
     }
+
+    if (state == AGENT_CONNECTED) digitalWrite(LED_PIN, 1);
+	else
+	{
+		digitalWrite(LED_PIN, 0);
+		delay(100);
+	}
 
     // Add delay to prevent watchdog triggers
     delay(10);
@@ -291,13 +310,12 @@ void RosComm::destroy() {
 // }
 
 void RosComm::updateKeyboardValue() { 
-    if (state == AGENT_CONNECTED && RosComm::key_msg != NULL && RosComm::key_msg->data != 0) {
+    if (state == AGENT_CONNECTED && RosComm::key_msg != NULL) {
         this->keyVal = RosComm::key_msg->data;
         // Add debug print for keyboard value updates
-        // Serial.print("Updated keyboard value: ");
-        // Serial.println(this->keyVal);
+        Serial.print("Updated keyboard value: ");
+        Serial.println(this->keyVal);
     }
-    else this->keyVal = 0;
 }
 
 int8_t RosComm::getkeyboardValue() {

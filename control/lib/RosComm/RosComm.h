@@ -9,14 +9,8 @@
 #include <rcl/rcl.h>
 #include <rclc/rclc.h>
 #include <rclc/executor.h>
-
-#include <std_msgs/msg/int16_multi_array.h>
-#include <std_msgs/msg/float32_multi_array.h>
-
 #include <std_msgs/msg/int8.h>
-#include <std_msgs/msg/int32.h>
-#include <std_msgs/msg/float32.h>
-#include <std_msgs/msg/string.h>
+
 
 // Wi-Fi credentials
 #define WIFI_SSID "Honor 50"       
@@ -27,7 +21,7 @@
 #if defined(LED_BUILTIN)
   #define LED_PIN LED_BUILTIN
 #else
-  #define LED_PIN 17
+  #define LED_PIN 13
 #endif
 
 // WIFI
