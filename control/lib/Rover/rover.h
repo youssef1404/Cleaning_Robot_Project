@@ -14,7 +14,7 @@ class Rover
         MotorDriver driver;
         // void updateDistance();
         void move();
-        int keyValue;
+        int8_t keyValue;
     public:
         void setup();
         void loop();

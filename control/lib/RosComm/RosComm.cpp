@@ -59,27 +59,8 @@ bool RosComm::initialize() {
                                 AGENT_PORT);
 	// printWifiStatus();
 
-    // Initialize message structures with checks
-    Serial.println("Creating message structures...");
-    RosComm::key_msg = std_msgs__msg__Int8__create();
-    if (RosComm::key_msg == NULL) {
-        Serial.println("Failed to create key_msg");
-        return false;
-    }
-
-    // RosComm::ultra_msg = std_msgs__msg__Float32__create();
-    // if (RosComm::ultra_msg == NULL) {
-    //     Serial.println("Failed to create ultra_msg");
-    //     if (RosComm::key_msg != NULL) {
-    //         std_msgs__msg__Int8__destroy(RosComm::key_msg);
-    //         RosComm::key_msg = NULL;
-    //     }
-    //     return false;
-    // }
 
 
-   	// Serial.println("Initializing message data...");
-    RosComm::key_msg->data = 0;
     // RosComm::ultra_msg->data = 0.0f;
 
     Serial.println("Setting up LED...");
@@ -137,6 +118,17 @@ bool RosComm::create_entities() {
     //     Serial.println("Failed to create timer");
     //     return false;
     // }
+
+    // Initialize message structures with checks
+    Serial.println("Creating message structures...");
+    RosComm::key_msg = (std_msgs__msg__Int8*)malloc(sizeof(std_msgs__msg__Int8));
+    if (RosComm::key_msg == NULL) {
+        Serial.println("Failed to create key_msg");
+        return false;
+    }
+    Serial.println("Initializing message data...");
+    RosComm::key_msg->data = 0;
+
 
     if (RCL_RET_OK != rclc_executor_init(&this->executor, &this->support.context, 2, &this->allocator)) {
         Serial.println("Failed to initialize executor");
@@ -230,17 +222,17 @@ void RosComm::loop() {
 
     case AGENT_CONNECTED:
         EXECUTE_EVERY_N_MS(200, {
-            bool ping_ok = (RMW_RET_OK == rmw_uros_ping_agent(100, 1));
+            bool ping_ok = (RMW_RET_OK == rmw_uros_ping_agent(500, 1));
             if (!ping_ok) {
                 Serial.println("Lost connection to agent");
                 state = AGENT_DISCONNECTED;
             }
         });
-        
-        if (state == AGENT_CONNECTED) {
-            Serial.println("Spinning executor...");
+        if (state == AGENT_CONNECTED)
+        {
             rclc_executor_spin_some(&this->executor, RCL_MS_TO_NS(100));
         }
+    
         break;
 
     case AGENT_DISCONNECTED:
@@ -302,9 +294,10 @@ void RosComm::updateKeyboardValue() {
     if (state == AGENT_CONNECTED && RosComm::key_msg != NULL && RosComm::key_msg->data != 0) {
         this->keyVal = RosComm::key_msg->data;
         // Add debug print for keyboard value updates
-        Serial.print("Updated keyboard value: ");
-        Serial.println(this->keyVal);
+        // Serial.print("Updated keyboard value: ");
+        // Serial.println(this->keyVal);
     }
+    else this->keyVal = 0;
 }
 
 int8_t RosComm::getkeyboardValue() {

@@ -12,6 +12,7 @@ void MotorDriver::initialMotors(){
 }
 
 void MotorDriver::moveForward() {
+    Serial.println("moving Forward");
     // Motor A forward
     digitalWrite(this->driverPins[0], LOW); // IN1
     digitalWrite(this->driverPins[1], HIGH); // IN2
@@ -28,6 +29,7 @@ void MotorDriver::moveForward() {
 }
 
 void MotorDriver::moveBackward() {
+    Serial.println("moving Backward");
     // Motor A backward
     digitalWrite(this->driverPins[0], HIGH); // IN1
     digitalWrite(this->driverPins[1], LOW); // IN2
@@ -42,11 +44,12 @@ void MotorDriver::moveBackward() {
 }
 
 void MotorDriver::rotateRight() {
+    Serial.println("moving Right");
     // Rotate in place by stopping one motor
     digitalWrite(this->driverPins[0], LOW); // IN1
-    digitalWrite(this->driverPins[1], LOW); // IN2
+    digitalWrite(this->driverPins[1], HIGH); // IN2
     digitalWrite(this->driverPins[2], LOW); // IN3
-    digitalWrite(this->driverPins[3], HIGH); // IN4
+    digitalWrite(this->driverPins[3], LOW); // IN4
     
     // Set speed for both motors
     analogWrite(this->driverPins[4], 0); // ENA
@@ -54,11 +57,12 @@ void MotorDriver::rotateRight() {
 }
 
 void MotorDriver::rotateLeft() {
+    Serial.println("moving Left");
     // Rotate in place by stopping one motor
     digitalWrite(this->driverPins[0], LOW); // IN1
-    digitalWrite(this->driverPins[1], HIGH); // IN2
+    digitalWrite(this->driverPins[1], LOW); // IN2
     digitalWrite(this->driverPins[2], LOW); // IN3
-    digitalWrite(this->driverPins[3], LOW); // IN4
+    digitalWrite(this->driverPins[3], HIGH); // IN4
     
     // Set speed for both motors
     analogWrite(this->driverPins[4], DEFAULT_SPEED); // ENA

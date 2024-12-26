@@ -16,16 +16,16 @@
     0, 1, 3, 6, 7, 8, 9, 10, 11, 12, 15, 
 }*/
 
-#define MOTOR_IN1 12
-#define MOTOR_IN2 13
-#define MOTOR_IN3 14
-#define MOTOR_IN4 15
-#define MOTOR_ENA 16
-#define MOTOR_ENB 17
+#define MOTOR_IN1 21
+#define MOTOR_IN2 19
+#define MOTOR_IN3 18
+#define MOTOR_IN4 5
+#define MOTOR_ENA 23
+#define MOTOR_ENB 22
 
 #define MAX_SPEED 255
 #define MIN_SPEED 0
-#define DEFAULT_SPEED 50
+#define DEFAULT_SPEED 200
 
 class MotorDriver
 {
