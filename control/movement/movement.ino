@@ -1,5 +1,4 @@
 #include <Timer.h>
-#include <Arduino.h>
 
 #include "Config.h"
 #include "pid_controller.h"
@@ -52,8 +51,7 @@ float pid_output[] = {0,0};
 float pid_parameters[] = {kp0,ki0,kd0,kp1,ki1,kd1};
 
 void setup(){
-  // analogWriteResolution(16);
-
+///
   Interrupt[0].Init();
   Interrupt[1].Init();
 
