@@ -1,5 +1,4 @@
 #include "mechServo.h"
-#include "config.h"
 
 void MechServo::init(){
     this->mechServo.attach(SERVO_PIN);
@@ -23,6 +22,8 @@ void MechServo::tiltUp(){
 }
 
 void MechServo::move(int but){
+    Serial.println("here, vcc");
+    Serial.println(SERVO_VCC);
     this->currentAngle = but;
     if (this->currentAngle < LOWER_LIMIT) this->currentAngle = LOWER_LIMIT;
     if (this->currentAngle > UPPER_LIMIT) this->currentAngle = UPPER_LIMIT;

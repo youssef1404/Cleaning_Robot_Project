@@ -62,23 +62,28 @@ def main(args=None):
             key = get_key()
 
             # Map keys to specific integers
-            key_mapping_move = {'w': [keyboard_publisher.speed, keyboard_publisher.speed] ,
-                            's': [-1 * keyboard_publisher.speed, -1 * keyboard_publisher.speed],
-                            'd': [0.0,  keyboard_publisher.speed],
-                            'a': [keyboard_publisher.speed, 0.0],
-                            ' ': [0.0, 0.0]}
+            # key_mapping_move = {'w': [keyboard_publisher.speed, keyboard_publisher.speed] ,
+            #                 's': [-1 * keyboard_publisher.speed, -1 * keyboard_publisher.speed],
+            #                 'd': [0.0,  keyboard_publisher.speed],
+            #                 'a': [keyboard_publisher.speed, 0.0],
+            #                 ' ': [0.0, 0.0]}
 
             # servo readings
             key_mappings = {'m': 1,
                             'n': 2,
                             'b': 3,
-                            'v': 4}
+                            'v': 4,
+                            'w': 5,
+                            's': 6,
+                            'd': 7,
+                            'a': 8,
+                            ' ': 9}
             if key == '\x03':  # CTRL+C to exit
                 break
 
-            if key in key_mapping_move:
-                keyboard_publisher.publish_setPoint(key_mapping_move[key])
-            elif key in key_mappings:
+            # if key in key_mapping_move:
+            #     keyboard_publisher.publish_setPoint(key_mapping_move[key])
+            if key in key_mappings:
                 keyboard_publisher.publish_keys(key_mappings[key])
             else:
                 keyboard_publisher.get_logger().warn(f"Unmapped key '{key}' pressed. Ignoring.")

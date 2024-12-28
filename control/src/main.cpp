@@ -4,8 +4,7 @@
 #include "eInterrupt.h"
 #include "l298n.h"
 #include "driver.h"
-// #include "mechSer"
-
+#include "mechServo.h"
 
 #include <micro_ros_arduino.h>
 #include <rcl/rcl.h>
@@ -71,7 +70,8 @@ eInterrupt Interrupt[]{eInterrupt(pin_A1, pin_B1, RESOLUTION),
 //creating motor driver objects
 L298N l298n[]{L298N(enable_pin_1, input1_1, input2_1),
               L298N(enable_pin_2, input1_2, input2_2)};
-// MotorDriver driver;
+MotorDriver driver;
+MechServo servo;
 
 
 float counts_data[] = {0,0};
@@ -91,28 +91,30 @@ void setup(){
   set_microros_wifi_transports((char*)ssid, (char*)password, ip_buffer, agent_port);	
   printWifiStatus();
 
-  Interrupt[0].Init();
-  Interrupt[1].Init();
+  // Interrupt[0].Init();
+  // Interrupt[1].Init();
 
-  l298n[0].driver_init();
-  l298n[1].driver_init();
-  // driver.initialMotors();
+  // l298n[0].driver_init();
+  // l298n[1].driver_init();
+
+  servo.init();
+  driver.initialMotors();
 
   create_entities();
 
-  timer.every(TIME_FREQ, update_encoder);
+  // timer.every(TIME_FREQ, update_encoder);
 
-  attachInterrupt(digitalPinToInterrupt(Interrupt[0].pin_A), Motor0_ISR_EncoderA, CHANGE);
-  attachInterrupt(digitalPinToInterrupt(Interrupt[0].pin_B), Motor0_ISR_EncoderB, CHANGE);
-  attachInterrupt(digitalPinToInterrupt(Interrupt[1].pin_A), Motor1_ISR_EncoderA, CHANGE);
-  attachInterrupt(digitalPinToInterrupt(Interrupt[1].pin_B), Motor1_ISR_EncoderB, CHANGE);
+  // attachInterrupt(digitalPinToInterrupt(Interrupt[0].pin_A), Motor0_ISR_EncoderA, CHANGE);
+  // attachInterrupt(digitalPinToInterrupt(Interrupt[0].pin_B), Motor0_ISR_EncoderB, CHANGE);
+  // attachInterrupt(digitalPinToInterrupt(Interrupt[1].pin_A), Motor1_ISR_EncoderA, CHANGE);
+  // attachInterrupt(digitalPinToInterrupt(Interrupt[1].pin_B), Motor1_ISR_EncoderB, CHANGE);
 }
 
 void loop(){
-  timer.update();
-  speed_controll();
-  publish_readings();
-  delay(10);
+  // timer.update();
+  // speed_controll();
+  // publish_readings();
+  // delay(10);
   rclc_executor_spin_some(&executor, RCL_MS_TO_NS(20));
 }
 
@@ -188,38 +190,37 @@ void key_input_callback(const void *msgin)
   Serial.println("keyboard number ");
   Serial.println(key);
 
-  // switch(key) {
-  //   case 1: // Forward
-  //     // setpoint[0] = 1.0;  // Right wheel forward
-  //     // setpoint[1] = 1.0;  // Left wheel forward
-  //     driver.moveForward();
-  //     break;
-      
-      
-  //   case 2: // Backward
-  //     // setpoint[0] = -1.0; // Right wheel backward
-  //     // setpoint[1] = -1.0; // Left wheel backward
-  //     driver.moveBackward();
-  //     break;
-      
-  //   case 4: // Left turn
-  //     // setpoint[0] = 1.0;  // Right wheel forward
-  //     // setpoint[1] = -1.0; // Left wheel backward
-  //     driver.rotateLeft();
-  //     break;
-      
-  //   case 3: // Right turn
-  //     // setpoint[0] = -1.0; // Right wheel backward
-  //     // setpoint[1] = 1.0;  // Left wheel forward
-  //     driver.rotateRight();
-  //     break;
-  //   default:
-  //     // No change in setpoints if unknown key
-  //     // setpoint[0] = 0.0;  // Right wheel stop
-  //     // setpoint[1] = 0.0;  // Left wheel stop
-  //     driver.stop();
-  //     break;
-  // }
+  switch(key) {
+    case 5: // Forward
+      driver.moveForward();
+      break;
+    case 6: // Backward
+      driver.moveBackward();
+      break;
+    case 8: // Left turn
+      driver.rotateLeft();
+      break;
+    case 7: // Right turn
+      driver.rotateRight();
+      break;
+    case 9:
+      driver.stop();
+      break;
+    case 1: // up servo
+      servo.move(180);
+      break;
+    case 2: // down servo
+      servo.move(0);
+      break;
+    case 3: // turn on the magnet
+      digitalWrite(MAGNET_PIN, HIGH);
+      break;
+    case 4: // turn off the magnet
+      digitalWrite(MAGNET_PIN, LOW);
+      break;
+    default:
+      break;
+  }
 }
 
 void Motor0_ISR_EncoderA()
@@ -304,15 +305,12 @@ void create_entities(){
   rclc_executor_add_subscription(&executor, &key_input_subscriber, &key_msg, &key_input_callback, ON_NEW_DATA);
 }
 
-
-
 //  switch(key) {
 //     case 1: // Forward
 //       // setpoint[0] = 1.0;  // Right wheel forward
 //       // setpoint[1] = 1.0;  // Left wheel forward
 //       driver.moveForward();
 //       break;
-      
       
 //     case 2: // Backward
 //       // setpoint[0] = -1.0; // Right wheel backward

@@ -2,6 +2,7 @@
 #define DRIVER_H
 
 #include <Arduino.h>
+#include "Config.h"
 
 
 // driverPins[0] = IN1 
@@ -15,14 +16,8 @@
     0, 1, 3, 6, 7, 8, 9, 10, 11, 12, 15, 
 }*/
 
-#define enable_pin_1 23
-#define enable_pin_2 22
-#define input1_1 21
-#define input1_2 19
-#define input2_1 18
-#define input2_2 5
 
-#define default_speed 150
+
 
 class MotorDriver
 {
