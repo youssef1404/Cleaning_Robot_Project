@@ -25,11 +25,11 @@
 #define input2_1 18
 #define input2_2 5
 
-#define default_speed 150
+#define default_speed 255
 
 // Wi-Fi credentials
 #define WIFI_SSID "Honor 50"       
 #define WIFI_PASSWORD "12345678" 
 #define AGENT_IP "192.168.5.203"           
-#define AGENT_PORT 8889
+#define AGENT_PORT 8888
 

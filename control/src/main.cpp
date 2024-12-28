@@ -4,12 +4,15 @@
 #include "eInterrupt.h"
 #include "l298n.h"
 #include "driver.h"
+// #include "mechSer"
+
 
 #include <micro_ros_arduino.h>
 #include <rcl/rcl.h>
 #include <rcl/error_handling.h>
 #include <rclc/rclc.h>
 #include <rclc/executor.h>
+#include <IPAddress.h>
 
 #include <std_msgs/msg/float32_multi_array.h>
 #include <std_msgs/msg/int8.h>
@@ -31,7 +34,7 @@ std_msgs__msg__Float32MultiArray speed_feedback_msg;
 std_msgs__msg__Float32MultiArray counts_msg;
 std_msgs__msg__Float32MultiArray speed_setpoint_msg;
 std_msgs__msg__Float32MultiArray pid_parameters__msg;
-std_msgs__msg__Int8 key_input_msg;
+std_msgs__msg__Int8 key_msg;
 
 Timer timer;
 
@@ -47,8 +50,15 @@ void Motor0_ISR_EncoderB();
 void Motor1_ISR_EncoderA();
 void Motor1_ISR_EncoderB();
 void create_entities();
-
 void printWifiStatus();
+
+// WiFi credentials
+const char* ssid = "Honor 50";
+const char* password = "12345678";
+
+// Micro-ROS agent settings
+const size_t agent_port = 8888;
+IPAddress agent_ip(192, 168, 5, 203);
 
 //creating PID objects
 PIDController PID[]{PIDController(kp0, ki0, kd0, OUTPUTLIMITS, DEADZONE),
@@ -63,6 +73,7 @@ L298N l298n[]{L298N(enable_pin_1, input1_1, input2_1),
               L298N(enable_pin_2, input1_2, input2_2)};
 // MotorDriver driver;
 
+
 float counts_data[] = {0,0};
 float setpoint[] = {1,1};
 float speed_feedback[] = {0,0};
@@ -72,17 +83,20 @@ float pid_parameters[] = {kp0,ki0,kd0,kp1,ki1,kd1};
 void setup(){
   Serial.begin(115200);
 
-  set_microros_wifi_transports(WIFI_SSID, 
-                            WIFI_PASSWORD, 
-                            AGENT_IP, 
-                            AGENT_PORT);
-	printWifiStatus();
+  char ip_buffer[16]; // Enough to hold an IPv4 address (e.g., "255.255.255.255")
+  snprintf(ip_buffer, sizeof(ip_buffer), "%s", agent_ip.toString().c_str());
+  // set_microros_transports();
+
+  // Set Micro-ROS WiFi transports
+  set_microros_wifi_transports((char*)ssid, (char*)password, ip_buffer, agent_port);	
+  printWifiStatus();
 
   Interrupt[0].Init();
   Interrupt[1].Init();
 
   l298n[0].driver_init();
   l298n[1].driver_init();
+  // driver.initialMotors();
 
   create_entities();
 
@@ -98,7 +112,7 @@ void loop(){
   timer.update();
   speed_controll();
   publish_readings();
-  delay(20);
+  delay(10);
   rclc_executor_spin_some(&executor, RCL_MS_TO_NS(20));
 }
 
@@ -140,6 +154,9 @@ void publish_readings()
   rcl_publish(&pid_output_publisher, &pid_output_msg, NULL);
   rcl_publish(&speed_feedback_publisher, &speed_feedback_msg, NULL);
   rcl_publish(&counts_publisher, &counts_msg, NULL);
+  Serial.println("encoder counts ");
+  Serial.println(counts_data[0]);
+  Serial.println(counts_data[1]);
 }
 
 void speed_setpoint_callback(const void *msgin)
@@ -147,6 +164,10 @@ void speed_setpoint_callback(const void *msgin)
   const std_msgs__msg__Float32MultiArray * msg = (const std_msgs__msg__Float32MultiArray *)msgin;
   setpoint[0] = msg->data.data[0];
   setpoint[1] = msg->data.data[1];
+  Serial.println("setpoint 1: ");
+  Serial.println(setpoint[0]);
+  Serial.println("setpoint 2: ");
+  Serial.println(setpoint[1]);
 }
 
 void pid_parameters_callback(const void *msgin)
@@ -166,24 +187,39 @@ void key_input_callback(const void *msgin)
   int8_t key = msg->data;
   Serial.println("keyboard number ");
   Serial.println(key);
-//    switch(key) {
-//     case 1: // Forward
-//       l298n[0].set_speed();
-//       l298n[1].set_direction();
-//       break;
-//     case 2: // Backward
-// 		driver.moveBackward();
-//       break;
-//     case 3: // right
-//       driver.rotateRight();
-//       break;
-//     case 4: // left
-//       driver.rotateLeft();
-//       break;
-//     default: // Stop
-// 		driver.stop();
-//       break;
-// }
+
+  // switch(key) {
+  //   case 1: // Forward
+  //     // setpoint[0] = 1.0;  // Right wheel forward
+  //     // setpoint[1] = 1.0;  // Left wheel forward
+  //     driver.moveForward();
+  //     break;
+      
+      
+  //   case 2: // Backward
+  //     // setpoint[0] = -1.0; // Right wheel backward
+  //     // setpoint[1] = -1.0; // Left wheel backward
+  //     driver.moveBackward();
+  //     break;
+      
+  //   case 4: // Left turn
+  //     // setpoint[0] = 1.0;  // Right wheel forward
+  //     // setpoint[1] = -1.0; // Left wheel backward
+  //     driver.rotateLeft();
+  //     break;
+      
+  //   case 3: // Right turn
+  //     // setpoint[0] = -1.0; // Right wheel backward
+  //     // setpoint[1] = 1.0;  // Left wheel forward
+  //     driver.rotateRight();
+  //     break;
+  //   default:
+  //     // No change in setpoints if unknown key
+  //     // setpoint[0] = 0.0;  // Right wheel stop
+  //     // setpoint[1] = 0.0;  // Left wheel stop
+  //     driver.stop();
+  //     break;
+  // }
 }
 
 void Motor0_ISR_EncoderA()
@@ -265,6 +301,40 @@ void create_entities(){
   rclc_executor_init(&executor, &support.context, 3, &allocator);
   rclc_executor_add_subscription(&executor, &speed_setpoint_subscriper, &speed_setpoint_msg, &speed_setpoint_callback, ON_NEW_DATA);
   rclc_executor_add_subscription(&executor, &pid_parameters_subscirper, &pid_parameters__msg, &pid_parameters_callback, ON_NEW_DATA);
-  rclc_executor_add_subscription(&executor, &key_input_subscriber, &key_input_msg, &key_input_callback, ON_NEW_DATA);
+  rclc_executor_add_subscription(&executor, &key_input_subscriber, &key_msg, &key_input_callback, ON_NEW_DATA);
 }
 
+
+
+//  switch(key) {
+//     case 1: // Forward
+//       // setpoint[0] = 1.0;  // Right wheel forward
+//       // setpoint[1] = 1.0;  // Left wheel forward
+//       driver.moveForward();
+//       break;
+      
+      
+//     case 2: // Backward
+//       // setpoint[0] = -1.0; // Right wheel backward
+//       // setpoint[1] = -1.0; // Left wheel backward
+//       driver.moveBackward();
+//       break;
+      
+//     case 4: // Left turn
+//       // setpoint[0] = 1.0;  // Right wheel forward
+//       // setpoint[1] = -1.0; // Left wheel backward
+//       driver.rotateLeft();
+//       break;
+      
+//     case 3: // Right turn
+//       // setpoint[0] = -1.0; // Right wheel backward
+//       // setpoint[1] = 1.0;  // Left wheel forward
+//       driver.rotateRight();
+//       break;
+//     default:
+//       // No change in setpoints if unknown key
+//       // setpoint[0] = 0.0;  // Right wheel stop
+//       // setpoint[1] = 0.0;  // Left wheel stop
+//       driver.stop();
+//       break;
+//   }
