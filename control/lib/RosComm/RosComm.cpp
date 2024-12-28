@@ -1,6 +1,9 @@
 #include "RosComm.h"
 
-std_msgs__msg__Int8 *RosComm::key_msg = NULL;
+// rcl_publisher_t RosComm::ultra_pub;
+// rcl_publisher_t RosComm::motor_feed_pub;
+std_msgs__msg__Int8* RosComm::key_msg = NULL;
+// std_msgs__msg__Float32* RosComm::ultra_msg = NULL;
 
 #define RCCHECK(fn)                  \
     {                                \
@@ -26,247 +29,302 @@ std_msgs__msg__Int8 *RosComm::key_msg = NULL;
         }                                  \
     } while (0)
 
-RosComm::RosComm() : node_name("esp32"),
-                     motion_topic_name("/key_input"),
-                     agent_ip(192, 168, 1, 18),
-                     agent_port(AGENT_PORT),
-                     ssid(WIFI_SSID),
-                     psk(WIFI_PASSWORD),
-                     keyVal(0)
+RosComm::RosComm(): node_name("esp32"),
+                    // ultra_topic_name("/distance"),
+					motion_topic_name("/key_input"),
+                    agent_ip(192, 168, 1, 18),
+                    agent_port(AGENT_PORT),
+                    ssid(WIFI_SSID),
+                    psk(WIFI_PASSWORD),
+                    keyVal(0),
+                    distance(0.0f)
 {
     this->my_sub = rcl_get_zero_initialized_subscription();
     this->state = WAITING_AGENT;
-    this->connection_attempts = 0;
-    this->last_reconnect_attempt = 0;
 }
 
-bool RosComm::initialize()
-{
+bool RosComm::initialize() {
     Serial.println("Starting initialization...");
-
-    destroy(); // Make sure we start clean
-
+    
+    destroy();  // Make sure we start clean
+    
+    // Serial.printf("Free heap before allocation: %d\n", ESP.getFreeHeap());
+    
+    // Add delay to ensure serial prints are visible
     delay(1000);
 
-    // Initialize WiFi with retry mechanism
-    if (!setupWiFiConnection())
-    {
-        Serial.println("Failed to establish WiFi connection");
-        return false;
-    }
+    set_microros_wifi_transports(WIFI_SSID, 
+                                WIFI_PASSWORD, 
+                                AGENT_IP, 
+                                AGENT_PORT);
+	// printWifiStatus();
 
-    set_microros_wifi_transports(WIFI_SSID,
-                                 WIFI_PASSWORD,
-                                 AGENT_IP,
-                                 AGENT_PORT);
 
-    Serial.println("Creating message structures...");
-    RosComm::key_msg = std_msgs__msg__Int8__create();
-    if (RosComm::key_msg == NULL)
-    {
-        Serial.println("Failed to create key_msg");
-        return false;
-    }
 
-    RosComm::key_msg->data = 0;
+    // RosComm::ultra_msg = std_msgs__msg__Float32__create();
+    // if (RosComm::ultra_msg == NULL) {
+    //     Serial.println("Failed to create ultra_msg");
+    //     if (RosComm::key_msg != NULL) {
+    //         std_msgs__msg__Int8__destroy(RosComm::key_msg);
+    //         RosComm::key_msg = NULL;
+    //     }
+    //     return false;
+    // }
+
+
+   	// Serial.println("Initializing message data...");
+
+    // RosComm::ultra_msg->data = 0.0f;
 
     Serial.println("Setting up LED...");
     pinMode(LED_PIN, OUTPUT);
     digitalWrite(LED_PIN, HIGH);
-
+    
     Serial.println("Initialization complete!");
     this->state = WAITING_AGENT;
     return true;
 }
 
-bool RosComm::setupWiFiConnection()
-{
-    WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+bool RosComm::create_entities() {
+    // create allocator
+    this->allocator = rcl_get_default_allocator();
 
-    int attempts = 0;
-    while (WiFi.status() != WL_CONNECTED && attempts < 20)
-    {
-        delay(500);
-        Serial.print(".");
-        attempts++;
-    }
-
-    if (WiFi.status() != WL_CONNECTED)
-    {
-        Serial.println("\nWiFi connection failed!");
+    // create init_options
+    if (RCL_RET_OK != rclc_support_init(&this->support, 0, NULL, &this->allocator)) {
+        Serial.println("Failed to initialize support");
         return false;
     }
 
-    Serial.println("\nWiFi connected!");
-    printWifiStatus();
-    return true;
-}
+    // create node
+    if (RCL_RET_OK != rclc_node_init_default(&this->node, this->node_name, "", &this->support)) {
+        Serial.println("Failed to initialize node");
+        return false;
+    }
 
-bool RosComm::create_entities()
-{
-    this->allocator = rcl_get_default_allocator();
-
-    RCCHECK(rclc_support_init(&this->support, 0, NULL, &this->allocator));
-    RCCHECK(rclc_node_init_default(&this->node, this->node_name, "", &this->support));
-
-    // Create subscriber with more robust error checking
-    rcl_ret_t sub_ret = rclc_subscription_init_default(
+    // create subscriber
+    if (RCL_RET_OK != rclc_subscription_init_default(
         &this->my_sub,
         &this->node,
         ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Int8),
-        this->motion_topic_name);
-
-    if (sub_ret != RCL_RET_OK)
-    {
-        Serial.printf("Failed to create subscriber: %d\n", sub_ret);
+        this->motion_topic_name)) {
+        Serial.println("Failed to create subscriber");
         return false;
     }
 
-    // Initialize executor with proper error checking
-    RCCHECK(rclc_executor_init(&this->executor, &this->support.context, 1, &this->allocator));
+    // // create publisher
+    // if (RCL_RET_OK != rclc_publisher_init_best_effort(
+    //     &this->ultra_pub,
+    //     &this->node,
+    //     ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Float32),
+    //     this->ultra_topic_name)) {
+    //     Serial.println("Failed to create publisher");
+    //     return false;
+    // }
 
-    RCCHECK(rclc_executor_add_subscription(
+    // // create timer
+    // if (RCL_RET_OK != rclc_timer_init_default2(
+    //     &timer,
+    //     &support,
+    //     RCL_MS_TO_NS(1000),
+    //     timer_callback,
+    //     true)) {
+    //     Serial.println("Failed to create timer");
+    //     return false;
+    // }
+
+    // Initialize message structures with checks
+    Serial.println("Creating message structures...");
+    RosComm::key_msg = std_msgs__msg__Int8__create();
+    if (RosComm::key_msg == NULL) {
+        Serial.println("Failed to create key_msg");
+        return false;
+    }
+    RosComm::key_msg = (std_msgs__msg__Int8*)malloc(sizeof(std_msgs__msg__Int8));
+    RosComm::key_msg->data = 0;
+
+
+
+    if (RCL_RET_OK != rclc_executor_init(&this->executor, &this->support.context, 2, &this->allocator)) {
+        Serial.println("Failed to initialize executor");
+        return false;
+    }
+
+    if (RCL_RET_OK != rclc_executor_add_subscription(
         &this->executor,
         &this->my_sub,
         &RosComm::key_msg,
         &RosComm::my_subscriber_callback,
-        ON_NEW_DATA));
+        ON_NEW_DATA)) {
+        Serial.println("Failed to add subscription to executor");
+        return false;
+    }
+
+    if (RCL_RET_OK != rclc_executor_add_timer(&this->executor, &this->timer)) {
+        Serial.println("Failed to add timer to executor");
+        return false;
+    }
 
     return true;
 }
 
-void RosComm::my_subscriber_callback(const void *msgin)
-{
-    if (msgin == NULL || RosComm::key_msg == NULL)
-    {
+// void RosComm::timer_callback(rcl_timer_t * timer, int64_t last_call_time) {
+//     RCLC_UNUSED(last_call_time);
+//     if (timer != NULL && RosComm::ultra_msg != NULL) {
+//         // Add debug print for publishing
+//         Serial.println(RosComm::ultra_msg->data);
+//         std::ignore = rcl_publish(&RosComm::ultra_pub, RosComm::ultra_msg, NULL);
+//     }
+// }
+
+void RosComm::my_subscriber_callback(const void *msgin) {
+    Serial.println("Subscriber callback entered");
+    
+    if (msgin == NULL) {
+        Serial.println("Error: Received NULL message");
         return;
     }
+    
+    // if (RosComm::key_msg == NULL) {
+    //     Serial.println("Error: key_msg is NULL");
+    //     return;
+    // }
 
-    const std_msgs__msg__Int8 *msg = (const std_msgs__msg__Int8 *)msgin;
+    const std_msgs__msg__Int8* msg = (const std_msgs__msg__Int8*)msgin;
+    Serial.printf("Received message data: %d\n", msg->data);
     RosComm::key_msg->data = msg->data;
-    Serial.printf("Received key: %d\n", msg->data);
 }
 
-void RosComm::loop()
-{
-    // Check WiFi connection first
-    if (WiFi.status() != WL_CONNECTED)
-    {
-        Serial.println("WiFi disconnected. Attempting to reconnect...");
-        if (setupWiFiConnection())
-        {
-            state = WAITING_AGENT;
+void RosComm::loop() {
+    static unsigned long lastPrint = 0;
+    unsigned long now = millis();
+    
+    // Print state every second
+    // if (now - lastPrint >= 1000) {
+    //     Serial.printf("Current state: %d, Free heap: %d\n", state, ESP.getFreeHeap());
+    //     lastPrint = now;
+    // }
+
+    // Add null checks before state machine
+    if (RosComm::key_msg == NULL ) {
+        Serial.println("Error: Message structures are NULL, reinitializing...");
+        if (initialize()) {
+            Serial.println("Reinitialization successful");
+        } else {
+            Serial.println("Reinitialization failed");
+            delay(1000);
+            return;
         }
-        delay(1000);
-        return;
     }
 
-    switch (state)
-    {
+    switch (state) {
     case WAITING_AGENT:
-        EXECUTE_EVERY_N_MS(1000, {
-            bool ping_ok = (RMW_RET_OK == rmw_uros_ping_agent(1000, 3)); // Increased timeout and retries
-            if (ping_ok)
-            {
-                Serial.println("Agent found!");
-                state = AGENT_AVAILABLE;
-                connection_attempts = 0;
-            }
-            else
-            {
-                connection_attempts++;
-                if (connection_attempts > 5)
-                {
-                    Serial.println("Multiple connection attempts failed. Reinitializing...");
-                    initialize();
-                    connection_attempts = 0;
-                }
-            }
+        EXECUTE_EVERY_N_MS(500, {
+            bool ping_ok = (RMW_RET_OK == rmw_uros_ping_agent(100, 1));
+            Serial.printf("Ping agent result: %d\n", ping_ok);
+            state = ping_ok ? AGENT_AVAILABLE : WAITING_AGENT;
         });
         break;
 
     case AGENT_AVAILABLE:
-        Serial.println("Creating entities...");
-        if (create_entities())
-        {
-            state = AGENT_CONNECTED;
-            Serial.println("Successfully connected to agent");
-        }
-        else
-        {
+        Serial.println("Agent available, creating entities...");
+        state = (true == this->create_entities()) ? AGENT_CONNECTED : WAITING_AGENT;
+        if (state == WAITING_AGENT) {
             Serial.println("Failed to create entities");
-            delay(1000);
-            state = WAITING_AGENT;
+            this->destroy();
         }
         break;
 
     case AGENT_CONNECTED:
-        EXECUTE_EVERY_N_MS(500, {
-            bool ping_ok = (RMW_RET_OK == rmw_uros_ping_agent(100, 2));
-            if (!ping_ok)
-            {
-                unsigned long current_time = millis();
-                if (current_time - last_reconnect_attempt > 5000)
-                { // Wait 5 seconds between reconnection attempts
-                    Serial.println("Lost connection to agent. Attempting to reconnect...");
-                    state = AGENT_DISCONNECTED;
-                    last_reconnect_attempt = current_time;
-                }
+        EXECUTE_EVERY_N_MS(200, {
+            bool ping_ok = (RMW_RET_OK == rmw_uros_ping_agent(100, 1));
+            if (!ping_ok) {
+                Serial.println("Lost connection to agent");
+                state = AGENT_DISCONNECTED;
             }
         });
-
-        if (state == AGENT_CONNECTED)
-        {
-            rclc_executor_spin_some(&this->executor, RCL_MS_TO_NS(100));
-        }
+        Serial.println("Spinning executor...");
+        rclc_executor_spin_some(&this->executor, RCL_MS_TO_NS(100));
+        
         break;
 
     case AGENT_DISCONNECTED:
-        Serial.println("Cleaning up and attempting to reconnect...");
-        destroy();
-        delay(1000); // Wait before attempting to reconnect
+        Serial.println("Agent disconnected, cleaning up...");
+        this->destroy();
         state = WAITING_AGENT;
         break;
     }
 
+    if (state == AGENT_CONNECTED) digitalWrite(LED_PIN, 1);
+	else
+	{
+		digitalWrite(LED_PIN, 0);
+		delay(100);
+	}
+
+    // Add delay to prevent watchdog triggers
+    delay(10);
+
+
     updateKeyboardValue();
-    delay(10); // Small delay to prevent watchdog triggers
+    // updateUltraMsg();
 }
 
-void RosComm::destroy()
-{
-    rmw_context_t *rmw_context = rcl_context_get_rmw_context(&support.context);
-    (void)rmw_uros_set_context_entity_destroy_session_timeout(rmw_context, 0);
-
-    rcl_subscription_fini(&this->my_sub, &this->node);
-    rclc_executor_fini(&this->executor);
-    rcl_node_fini(&this->node);
-    rclc_support_fini(&this->support);
-
-    if (RosComm::key_msg != NULL)
-    {
+void RosComm::destroy() {
+    if (this->state != AGENT_CONNECTED) {
+        // Only clean up ROS entities if we were connected
+        rmw_context_t *rmw_context = rcl_context_get_rmw_context(&support.context);
+        (void)rmw_uros_set_context_entity_destroy_session_timeout(rmw_context, 0);
+        
+        // std::ignore = rcl_publisher_fini(&RosComm::ultra_pub, &this->node);
+        std::ignore = rcl_subscription_fini(&this->my_sub, &this->node);
+        std::ignore = rcl_timer_fini(&this->timer);
+        rclc_executor_fini(&this->executor);
+        std::ignore = rcl_node_fini(&this->node);
+        rclc_support_fini(&this->support);
+    }
+    
+    // Always clean up message structures
+    if (RosComm::key_msg != NULL) {
         std_msgs__msg__Int8__destroy(RosComm::key_msg);
         RosComm::key_msg = NULL;
     }
+    // if (RosComm::ultra_msg != NULL) {
+    //     std_msgs__msg__Float32__destroy(RosComm::ultra_msg);
+    //     RosComm::ultra_msg = NULL;
+    // }
 }
 
-void RosComm::updateKeyboardValue()
-{
-    if (state == AGENT_CONNECTED && RosComm::key_msg != NULL && RosComm::key_msg->data != 0)
-    {
+// void RosComm::updateUltraMsg() {
+//     if (RosComm::ultra_msg != NULL) {
+//         this->distance = RosComm::ultra_msg->data;
+//         // Add debug print for ultrasonic updates
+//         EXECUTE_EVERY_N_MS(1000, {  // Print every second to avoid flooding Serial
+//             Serial.print("Current distance: ");
+//             Serial.println(this->distance);
+//         });
+//     }
+// }
+
+// float RosComm::getDistance() {
+//     return this->distance;
+// }
+
+void RosComm::updateKeyboardValue() { 
+    if (state == AGENT_CONNECTED && RosComm::key_msg != NULL) {
         this->keyVal = RosComm::key_msg->data;
+        // Add debug print for keyboard value updates
+        Serial.print("Updated keyboard value: ");
+        Serial.println(this->keyVal);
     }
 }
 
-int8_t RosComm::getkeyboardValue()
-{
-    if (state == AGENT_CONNECTED)
-        return this->keyVal;
-    return 0;
+int8_t RosComm::getkeyboardValue() {
+	if (state == AGENT_CONNECTED)
+    	return this->keyVal;
+	return 0;
 }
 
-void RosComm::printWifiStatus()
-{
+void RosComm::printWifiStatus() {
     Serial.print("WiFi Status: ");
     Serial.println(WiFi.status());
     Serial.print("IP Address: ");
