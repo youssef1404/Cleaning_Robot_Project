@@ -1,19 +1,21 @@
 import rclpy
 from rclpy.node import Node 
-from std_msgs.msg import Char
+from std_msgs.msg import Float32MultiArray
 import keyboard
 
 class Keyboard(Node):
     def __init__(self):
         super().__init__("keyboard_publisher")
-        self.publisher = self.create_publisher(Char, 'cmd_drive', 10)
+        self.publisher = self.create_publisher(Float32MultiArray, 'speed_setpoint', 10)
         self.get_logger().info("Keyboard Node Started")
+        self.msgsent = [0.0,0.0]
+        self.speed = 255.0
+        self.turn_speed = 126.0
 
     def send_command(self, command):
-        msg = Char()
-        msg.data = command
+        msg = Float32MultiArray()
+        msg.data = self.msgsent
         self.publisher.publish(msg)
-        self.get_logger().info(f"command: {command}")
     
 
 def main(args=None):
@@ -24,15 +26,15 @@ def main(args=None):
 
         while rclpy.ok():
             if keyboard.is_pressed('w'):
-                K_publisher.send_command('f')
-            elif keyboard.is_pressed('s'):
-                K_publisher.send_command('b')
+                K_publisher.msgsent = [K_publisher.speed, K_publisher.speed]
+            elif keyboard.is_pressed('s'): #right
+                K_publisher.msgsent = [0, K_publisher.speed]
             elif keyboard.is_pressed('a'): 
-                K_publisher.send_command('l')
+                K_publisher.msgsent = [K_publisher.speed,0 ]
             elif keyboard.is_pressed('d'):  
-                K_publisher.send_command('r')
+                K_publisher.msgsent = [0,0]
             elif keyboard.is_pressed('space'):  # Stop / start
-                K_publisher.send_command('s')
+                K_publisher.msgsent = [0,0]
         
     except KeyboardInterrupt:
         pass
