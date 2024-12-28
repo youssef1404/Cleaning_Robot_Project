@@ -4,14 +4,13 @@
 #define TIME_FREQ 30
 #define dt 0.03
 
-#define kp0 1
-#define kp1 1
-
-#define ki0 1
-#define ki1 1
-
-#define kd0 1
-#define kd1 1
+// PID parameters
+#define kp0 1.0
+#define ki0 0.1
+#define kd0 0.01
+#define kp1 1.0
+#define ki1 0.1
+#define kd1 0.01
 
 #define pin_A1 36
 #define pin_A2 34
@@ -26,11 +25,11 @@
 #define input2_1 18
 #define input2_2 5
 
-#define default_speed 200
+#define default_speed 150
 
 // Wi-Fi credentials
 #define WIFI_SSID "Honor 50"       
 #define WIFI_PASSWORD "12345678" 
 #define AGENT_IP "192.168.5.203"           
-#define AGENT_PORT 8888 
+#define AGENT_PORT 8889
 

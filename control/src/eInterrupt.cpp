@@ -20,7 +20,6 @@ float eInterrupt::calculate_speed(){
 void eInterrupt::Init(){
   pinMode(pin_A, INPUT_PULLUP);
   pinMode(pin_B, INPUT_PULLUP);
-
 }
 
 void eInterrupt::ISR_A_routine(){

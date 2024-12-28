@@ -35,7 +35,6 @@ class MyGUI(QMainWindow, View):
         executor_thread = Thread(target=self.executor.spin, daemon=True)
         executor_thread.start()
 
-
 def main(args=None):
     app = QApplication(sys.argv)
     window = MyGUI()

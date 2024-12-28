@@ -12,6 +12,7 @@ void L298N::driver_init(){
   pinMode(this->input1_pin, OUTPUT);
   pinMode(this->input2_pin, OUTPUT);
 }
+
 void L298N::set_speed(int speed){
   this->speed = abs(speed);
 }
