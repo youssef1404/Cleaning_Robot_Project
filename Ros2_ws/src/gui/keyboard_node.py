@@ -3,6 +3,7 @@ from rclpy.node import Node
 from std_msgs.msg import Float32MultiArray
 import keyboard
 
+
 class Keyboard(Node):
     def __init__(self):
         super().__init__("keyboard_publisher")
@@ -27,6 +28,8 @@ def main(args=None):
         while rclpy.ok():
             if keyboard.is_pressed('w'):
                 K_publisher.msgsent = [K_publisher.speed, K_publisher.speed]
+                K_publisher.get_logger().info(" pressesd")
+
             elif keyboard.is_pressed('s'): #right
                 K_publisher.msgsent = [0, K_publisher.speed]
             elif keyboard.is_pressed('a'): 
