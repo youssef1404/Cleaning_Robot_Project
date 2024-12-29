@@ -10,7 +10,6 @@ void Motor0_ISR_EncoderB();
 void Motor1_ISR_EncoderA();
 void Motor1_ISR_EncoderB();
 
-float speed_feedback[] = {0,0};
 
 
 //creating Encoder objects
@@ -34,22 +33,18 @@ void setup(){
 
 void loop(){
       timer.update();
-
 }
 
 void update_encoder(){
-    counts_data[0] = Interrupt[0].encoder_counts;
-    counts_data[1] = Interrupt[1].encoder_counts;
-    speed_feedback[0] = Interrupt[0].calculate_speed();
-    speed_feedback[1] = Interrupt[1].calculate_speed();
+
     Serial.print("Encoder one counts");
     Serial.println(Interrupt[0].encoder_counts);
         Serial.print("Encoder two counts");
     Serial.println(Interrupt[1].encoder_counts);
         Serial.print("Encoder one speeds");
-    Serial.println(speed_feedback[0]);
+    Serial.println(Interrupt[0].calculate_speed());
         Serial.print("Encoder two speeds");
-    Serial.println(speed_feedback[1]);
+    Serial.println(Interrupt[1].calculate_speed());
 }
 
 void Motor0_ISR_EncoderA()
