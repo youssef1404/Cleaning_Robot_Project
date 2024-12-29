@@ -50,6 +50,7 @@ void Motor1_ISR_EncoderA();
 void Motor1_ISR_EncoderB();
 void create_entities();
 void printWifiStatus();
+void handleKeys(uint8_t key);
 
 // WiFi credentials
 const char* ssid = "Honor 50";
@@ -183,44 +184,14 @@ void pid_parameters_callback(const void *msgin)
   pid_parameters[5] = msg->data.data[5];
 }
 
+
 void key_input_callback(const void *msgin)
 {
   const std_msgs__msg__Int8 * msg = (const std_msgs__msg__Int8 *)msgin;
   int8_t key = msg->data;
   Serial.println("keyboard number ");
   Serial.println(key);
-
-  switch(key) {
-    case 5: // Forward
-      driver.moveForward();
-      break;
-    case 6: // Backward
-      driver.moveBackward();
-      break;
-    case 8: // Left turn
-      driver.rotateLeft();
-      break;
-    case 7: // Right turn
-      driver.rotateRight();
-      break;
-    case 9:
-      driver.stop();
-      break;
-    case 1: // up servo
-      servo.move(180);
-      break;
-    case 2: // down servo
-      servo.move(0);
-      break;
-    case 3: // turn on the magnet
-      digitalWrite(MAGNET_PIN, HIGH);
-      break;
-    case 4: // turn off the magnet
-      digitalWrite(MAGNET_PIN, LOW);
-      break;
-    default:
-      break;
-  }
+  handleKeys(key);
 }
 
 void Motor0_ISR_EncoderA()
@@ -305,34 +276,36 @@ void create_entities(){
   rclc_executor_add_subscription(&executor, &key_input_subscriber, &key_msg, &key_input_callback, ON_NEW_DATA);
 }
 
-//  switch(key) {
-//     case 1: // Forward
-//       // setpoint[0] = 1.0;  // Right wheel forward
-//       // setpoint[1] = 1.0;  // Left wheel forward
-//       driver.moveForward();
-//       break;
-      
-//     case 2: // Backward
-//       // setpoint[0] = -1.0; // Right wheel backward
-//       // setpoint[1] = -1.0; // Left wheel backward
-//       driver.moveBackward();
-//       break;
-      
-//     case 4: // Left turn
-//       // setpoint[0] = 1.0;  // Right wheel forward
-//       // setpoint[1] = -1.0; // Left wheel backward
-//       driver.rotateLeft();
-//       break;
-      
-//     case 3: // Right turn
-//       // setpoint[0] = -1.0; // Right wheel backward
-//       // setpoint[1] = 1.0;  // Left wheel forward
-//       driver.rotateRight();
-//       break;
-//     default:
-//       // No change in setpoints if unknown key
-//       // setpoint[0] = 0.0;  // Right wheel stop
-//       // setpoint[1] = 0.0;  // Left wheel stop
-//       driver.stop();
-//       break;
-//   }
+void handleKeys(uint8_t key){
+  switch(key) {
+    case 5: // Forward
+      driver.moveForward();
+      break;
+    case 6: // Backward
+      driver.moveBackward();
+      break;
+    case 8: // Left turn
+      driver.rotateLeft();
+      break;
+    case 7: // Right turn
+      driver.rotateRight();
+      break;
+    case 9:
+      driver.stop();
+      break;
+    case 1: // up servo
+      servo.move(180);
+      break;
+    case 2: // down servo
+      servo.move(15);
+      break;
+    case 3: // turn on the magnet
+      digitalWrite(MAGNET_PIN, HIGH);
+      break;
+    case 4: // turn off the magnet
+      digitalWrite(MAGNET_PIN, LOW);
+      break;
+    default:
+      break;
+  }
+}

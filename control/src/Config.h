@@ -18,14 +18,14 @@
 #define pin_B1 39
 #define pin_B2 35
 
-#define enable_pin_1 32
-#define enable_pin_2 33
+#define enable_pin_1 23
+#define enable_pin_2 22
 #define input1_1 21
 #define input1_2 19
 #define input2_1 18
 #define input2_2 5
 
-#define default_speed 255
+#define default_speed 170
 
 // Wi-Fi credentials
 #define WIFI_SSID "Honor 50"       
