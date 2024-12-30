@@ -1,6 +1,6 @@
 import rclpy
 from rclpy.node import Node
-from std_msgs.msg import String  # Import String message type
+from std_msgs.msg import String  
 import cv2
 import torch
 from ultralytics import YOLO
@@ -10,20 +10,20 @@ class ObjectTrackingNode(Node):
         super().__init__('object_tracking_node')
 
         # Parameters
-        self.cmd_vel_topic = '/cmd_vel'
+        self.movement_topic = '/movement'
 
         # Publishers
-        self.publisher = self.create_publisher(String, self.cmd_vel_topic, 10)
+        self.publisher = self.create_publisher(String, self.movement_topic, 10)
 
         # Check if CUDA (GPU) is available
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self.get_logger().info(f"Using device: {self.device}")
 
         # Load YOLO model
-        self.model = YOLO("best.pt")  # Load your model file
+        self.model = YOLO("best.pt") 
 
-        # URL of your IP Webcam video stream
-        self.url = 'http://192.168.1.104:8080/video'  # Replace with your IP Webcam URL
+        # URL of IP Webcam video stream
+        self.url = 'http://192.168.1.104:8080/video' 
 
         # Open the video stream
         self.cap = cv2.VideoCapture(self.url)
@@ -47,7 +47,7 @@ class ObjectTrackingNode(Node):
         self.screen_center = (width // 2, height // 2)
 
         # Make predictions with YOLO on the current frame
-        results = self.model(frame)  # Inference on the frame
+        results = self.model(frame)  
 
         # Annotate the frame with YOLO results (bounding boxes, labels)
         annotated_frame = results[0].plot()
@@ -66,7 +66,7 @@ class ObjectTrackingNode(Node):
         # Display the annotated frame
         cv2.imshow('Annotated Frame', annotated_frame)
 
-        # Wait for 50 milliseconds and check if 'q' is pressed to exit
+        # Wait for 50 milliseconds 
         if cv2.waitKey(50) & 0xFF == ord('q'):
             self.cap.release()
             cv2.destroyAllWindows()
@@ -82,7 +82,6 @@ class ObjectTrackingNode(Node):
             # Control logic
             if abs(error_x) < 20:  # Tolerance for centered object
                 command = "forward"
-                # self.get_logger().info("forward")
             else:
                 command = "right" if error_x > 0 else "left"
         else:
@@ -90,7 +89,7 @@ class ObjectTrackingNode(Node):
 
         # Publish movement commands
         self.publisher.publish(String(data=command))  # Publish the command as a String message
-        self.get_logger().info(f"move {command}")
+        self.get_logger().info(f"{command}")
 
 def main(args=None):
     rclpy.init(args=args)
