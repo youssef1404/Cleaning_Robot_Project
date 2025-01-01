@@ -23,8 +23,6 @@ from rclpy.executors import MultiThreadedExecutor
 from PyQt5.QtGui import QImage, QPixmap
 import cv2 as cv
 
-address = "http://192.168.5.36:8080/video"
-
 class Rover_Main(QWidget, View, Node):
     def __init__(self, parent = None, executor:MultiThreadedExecutor = None):
         QWidget.__init__(self, parent)      # Initialize Qt widget functionality
@@ -34,8 +32,10 @@ class Rover_Main(QWidget, View, Node):
         self.setupUi(self)
         self.excutor = executor
         
+        self.url = "http://192.168.5.36:8080/video"
+        
         # Initialize nodes and components as before
-        self.webcam = Camera(name='main', address = address, label=self.camera_label)
+        self.webcam = Camera(name='main', address = self.url, label=self.camera_label)
         self.timer = Timer(label=self.timeLabel)
         self.speed_feedback = Comsystem(name="speed_feedback", labels=[self.speed_label_1, self.speed_label_2], sub_name="speed_feedback")
         self.encoder_counts = Comsystem(name="encoder_counts", labels=[self.count_label_1, self.count_label_2], sub_name="counts")
@@ -56,8 +56,10 @@ class Rover_Main(QWidget, View, Node):
         self.auto_button.clicked.connect(self.enableAuto)
         self.manuel_button.clicked.connect(self.enableManuel)
         
-        self.frame = None
         self.state = 0  # default manuel
+        self.updateModeText()
+
+        self.frame = None
         self.frameCount = 0
         self.rootPath = os.path.join(os.getcwd(), 'src', 'gui', 'gui', 'photos')
         os.makedirs(self.rootPath, exist_ok=True)
@@ -84,6 +86,7 @@ class Rover_Main(QWidget, View, Node):
         msg = Int8()
         msg.data = self.state
         self.mode_publisher.publish(msg)
+        self.updateModeText()
         self.get_logger().info(f"Enable Autonomous mode, published {self.state}")
 
     def enableManuel(self):
@@ -92,4 +95,11 @@ class Rover_Main(QWidget, View, Node):
         msg = Int8()
         msg.data = self.state
         self.mode_publisher.publish(msg)
+        self.updateModeText()
         self.get_logger().info(f"Enable manual mode, published {self.state}")
+
+    def updateModeText(self):
+        if self.state == 0:
+            self.mode_label.setText("Manuel")
+        else:
+            self.mode_label.setText("Auto")

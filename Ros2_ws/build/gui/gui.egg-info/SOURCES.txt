@@ -4,6 +4,7 @@ setup.py
 gui/__init__.py
 gui/keyboard.py
 gui/main.py
+gui/metal_detection.py
 gui/simple_subscriber.py
 gui.egg-info/PKG-INFO
 gui.egg-info/SOURCES.txt
