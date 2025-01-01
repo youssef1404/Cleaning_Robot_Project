@@ -7,8 +7,9 @@ class Utils:
     @staticmethod
     # Helper function to convert a numpy array image to a QImage
     def arrayToQImage(frame: np.ndarray):
-        image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        # image = cv2.resize(frame, (640, 360))
+        image = cv2.rotate(frame, cv2.ROTATE_90_COUNTERCLOCKWISE)
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        image = cv2.resize(image, (960, 540))
 
         height, width, channel = image.shape
         bytesPerLine = 3 * width

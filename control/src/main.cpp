@@ -188,7 +188,7 @@ void pid_parameters_callback(const void *msgin)
 void key_input_callback(const void *msgin)
 {
   const std_msgs__msg__Int8 * msg = (const std_msgs__msg__Int8 *)msgin;
-  int8_t key = msg->data;
+  uint8_t key = msg->data;
   Serial.println("keyboard number ");
   Serial.println(key);
   handleKeys(key);
