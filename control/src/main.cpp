@@ -2,7 +2,6 @@
 #include "Config.h"
 #include "pid_controller.h"
 #include "eInterrupt.h"
-#include "l298n.h"
 #include "driver.h"
 #include "mechServo.h"
 
@@ -68,9 +67,7 @@ PIDController PID[]{PIDController(kp0, ki0, kd0, OUTPUTLIMITS, DEADZONE),
 eInterrupt Interrupt[]{eInterrupt(pin_A1, pin_B1, RESOLUTION),
                       eInterrupt(pin_A2, pin_B2, RESOLUTION)};
 
-//creating motor driver objects
-L298N l298n[]{L298N(enable_pin_1, input1_1, input2_1),
-              L298N(enable_pin_2, input1_2, input2_2)};
+
 MotorDriver driver;
 MechServo servo;
 
@@ -92,30 +89,29 @@ void setup(){
   set_microros_wifi_transports((char*)ssid, (char*)password, ip_buffer, agent_port);	
   printWifiStatus();
 
-  // Interrupt[0].Init();
-  // Interrupt[1].Init();
+  Interrupt[0].Init();
+  Interrupt[1].Init();
 
-  // l298n[0].driver_init();
-  // l298n[1].driver_init();
+
 
   servo.init();
   driver.initialMotors();
 
   create_entities();
 
-  // timer.every(TIME_FREQ, update_encoder);
+  timer.every(TIME_FREQ, update_encoder);
 
-  // attachInterrupt(digitalPinToInterrupt(Interrupt[0].pin_A), Motor0_ISR_EncoderA, CHANGE);
-  // attachInterrupt(digitalPinToInterrupt(Interrupt[0].pin_B), Motor0_ISR_EncoderB, CHANGE);
-  // attachInterrupt(digitalPinToInterrupt(Interrupt[1].pin_A), Motor1_ISR_EncoderA, CHANGE);
-  // attachInterrupt(digitalPinToInterrupt(Interrupt[1].pin_B), Motor1_ISR_EncoderB, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(Interrupt[0].pin_A), Motor0_ISR_EncoderA, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(Interrupt[0].pin_B), Motor0_ISR_EncoderB, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(Interrupt[1].pin_A), Motor1_ISR_EncoderA, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(Interrupt[1].pin_B), Motor1_ISR_EncoderB, CHANGE);
 }
 
 void loop(){
-  // timer.update();
-  // speed_controll();
-  // publish_readings();
-  // delay(10);
+  timer.update();
+  speed_controll();
+  publish_readings();
+  delay(20);
   rclc_executor_spin_some(&executor, RCL_MS_TO_NS(20));
 }
 
@@ -136,13 +132,7 @@ void speed_controll(){
   pid_output[0] = PID[0].calculateOutput(speed_feedback[0]);
   pid_output[1] = PID[1].calculateOutput(speed_feedback[1]);
 
-  l298n[0].set_speed(pid_output[0]);
-  l298n[1].set_speed(pid_output[1]);
-  l298n[0].set_direction(pid_output[0]);
-  l298n[1].set_direction(pid_output[1]);
-
-  l298n[0].control_speed();
-  l298n[1].control_speed();
+  driver.setSpeed(pid_output[0],pid_output[1]);
 }
 
 void publish_readings()
@@ -157,9 +147,7 @@ void publish_readings()
   rcl_publish(&pid_output_publisher, &pid_output_msg, NULL);
   rcl_publish(&speed_feedback_publisher, &speed_feedback_msg, NULL);
   rcl_publish(&counts_publisher, &counts_msg, NULL);
-  Serial.println("encoder counts ");
-  Serial.println(counts_data[0]);
-  Serial.println(counts_data[1]);
+
 }
 
 void speed_setpoint_callback(const void *msgin)
@@ -167,10 +155,6 @@ void speed_setpoint_callback(const void *msgin)
   const std_msgs__msg__Float32MultiArray * msg = (const std_msgs__msg__Float32MultiArray *)msgin;
   setpoint[0] = msg->data.data[0];
   setpoint[1] = msg->data.data[1];
-  Serial.println("setpoint 1: ");
-  Serial.println(setpoint[0]);
-  Serial.println("setpoint 2: ");
-  Serial.println(setpoint[1]);
 }
 
 void pid_parameters_callback(const void *msgin)

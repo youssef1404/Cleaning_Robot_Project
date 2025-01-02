@@ -65,6 +65,8 @@ int MotorDriver::getCurrentSpeed(){
     return this->speed;
 }
 
-void MotorDriver::setSpeed(int newSpeed){
-    this->speed = newSpeed;
+void MotorDriver::setSpeed(int newSpeed_1,int newSpeed_2){
+    this->speed[0] = newSpeed_1;
+    this->speed[1] = newSpeed_1;
+
 }
