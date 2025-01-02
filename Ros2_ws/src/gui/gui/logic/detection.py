@@ -7,7 +7,6 @@ import cv2, sys
 from rclpy.executors import MultiThreadedExecutor
 from PySide6.QtWidgets import QWidget
 
-
 sys.path.append("src/gui/gui/ui")
 from detection_ui import Ui_Form as View
 
@@ -17,11 +16,13 @@ class ObjectTracking(QWidget, View, Node):
         View.__init__(self)                 # Initialize the UI view
         Node.__init__(self, 'Object_tracking_node')   # Initialize ROS2 node functionality
 
-        # Parameters
-        self.movement_topic = '/movement'
+        self.setupUi(self)
+        self.executor = executor
 
         # Publishers
-        self.publisher = self.create_publisher(String, self.movement_topic, 10)
+        self.publisher = self.create_publisher(String, '/movement', 10)
+
+        self.executor.add_node(self)
 
         # Check if CUDA (GPU) is available
         # self.device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -40,6 +41,7 @@ class ObjectTracking(QWidget, View, Node):
         # if not self.cap.isOpened():
         #     self.get_logger().error("Error: Unable to connect to the video stream.")
         #     exit()
+
 
         # Movement Variables
         self.screen_center = (0, 0)

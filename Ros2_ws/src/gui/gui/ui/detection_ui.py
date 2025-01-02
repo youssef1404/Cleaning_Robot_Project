@@ -573,7 +573,7 @@ class Ui_Form(object):
         self.label_8.setFont(font)
         self.box_label = QLabel(self.frame_4)
         self.box_label.setObjectName(u"box_label")
-        self.box_label.setGeometry(QRect(180, 16, 91, 31))
+        self.box_label.setGeometry(QRect(180, 10, 91, 31))
         self.label_10 = QLabel(self.frame_4)
         self.label_10.setObjectName(u"label_10")
         self.label_10.setGeometry(QRect(10, 61, 111, 20))

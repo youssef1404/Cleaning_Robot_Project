@@ -55,6 +55,8 @@ class Rover_Main(QWidget, View, Node):
         # self.stopButton.clicked.connect(self.stop_feed)
         self.auto_button.clicked.connect(self.enableAuto)
         self.manuel_button.clicked.connect(self.enableManuel)
+        self.hand_button.clicked.connect(self.enableHandGest)
+
         
         self.state = 0  # default manuel
         self.updateModeText()
@@ -80,15 +82,6 @@ class Rover_Main(QWidget, View, Node):
     def stop_feed(self):
         self.webcam.stop()
 
-    def enableAuto(self):
-        """Enable autonomous mode and publish state"""
-        self.state = 1
-        msg = Int8()
-        msg.data = self.state
-        self.mode_publisher.publish(msg)
-        self.updateModeText()
-        self.get_logger().info(f"Enable Autonomous mode, published {self.state}")
-
     def enableManuel(self):
         """Enable manual mode and publish state"""
         self.state = 0
@@ -98,8 +91,28 @@ class Rover_Main(QWidget, View, Node):
         self.updateModeText()
         self.get_logger().info(f"Enable manual mode, published {self.state}")
 
+    def enableAuto(self):
+        """Enable autonomous mode and publish state"""
+        self.state = 1
+        msg = Int8()
+        msg.data = self.state
+        self.mode_publisher.publish(msg)
+        self.updateModeText()
+        self.get_logger().info(f"Enable Autonomous mode, published {self.state}")
+
+    def enableHandGest(self):
+        """Enable hand mode and publish state"""
+        self.state = 2
+        msg = Int8()
+        msg.data = self.state
+        self.mode_publisher.publish(msg)
+        self.updateModeText()
+        self.get_logger().info(f"Enable manual mode, published {self.state}")
+
     def updateModeText(self):
         if self.state == 0:
             self.mode_label.setText("Manuel")
-        else:
+        elif self.state == 1:
             self.mode_label.setText("Auto")
+        else:
+            self.mode_label.setText("Hand Gesture")

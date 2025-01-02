@@ -794,11 +794,16 @@ class Ui_Form(object):
         self.frame_6.setFrameShadow(QFrame.Raised)
         self.label_13 = QLabel(self.frame_6)
         self.label_13.setObjectName(u"label_13")
-        self.label_13.setGeometry(QRect(10, 10, 81, 31))
+        self.label_13.setGeometry(QRect(10, 10, 81, 41))
         self.label_13.setFont(font1)
         self.mode_label = QLabel(self.frame_6)
         self.mode_label.setObjectName(u"mode_label")
         self.mode_label.setGeometry(QRect(110, 10, 131, 41))
+        self.hand_button = QPushButton(Form)
+        self.hand_button.setObjectName(u"hand_button")
+        self.hand_button.setGeometry(QRect(1130, 560, 141, 41))
+        self.hand_button.setFont(font4)
+        self.hand_button.setMouseTracking(True)
 
         self.retranslateUi(Form)
 
@@ -827,5 +832,6 @@ class Ui_Form(object):
         self.screenButton.setText(QCoreApplication.translate("Form", u"ScreenShot", None))
         self.label_13.setText(QCoreApplication.translate("Form", u"Mode:", None))
         self.mode_label.setText("")
+        self.hand_button.setText(QCoreApplication.translate("Form", u"Hand Gesture", None))
     # retranslateUi
 

@@ -596,7 +596,7 @@ QAbstractSpinBox {
     <property name="geometry">
      <rect>
       <x>180</x>
-      <y>16</y>
+      <y>10</y>
       <width>91</width>
       <height>31</height>
      </rect>

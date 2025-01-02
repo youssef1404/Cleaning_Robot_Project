@@ -1803,7 +1803,7 @@ QAbstractSpinBox {
       <x>10</x>
       <y>10</y>
       <width>81</width>
-      <height>31</height>
+      <height>41</height>
      </rect>
     </property>
     <property name="font">
@@ -1828,6 +1828,31 @@ QAbstractSpinBox {
      <string/>
     </property>
    </widget>
+  </widget>
+  <widget class="QPushButton" name="hand_button">
+   <property name="geometry">
+    <rect>
+     <x>1130</x>
+     <y>560</y>
+     <width>141</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Ubuntu</family>
+     <pointsize>-1</pointsize>
+     <weight>50</weight>
+     <italic>false</italic>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="mouseTracking">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Hand Gesture</string>
+   </property>
   </widget>
  </widget>
  <resources/>
