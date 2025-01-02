@@ -15,7 +15,7 @@ class Comsystem(Node):
     def updateData(self, msg):
         if type(self.labels == list):
             for i in range(len(self.labels)):
-                self.labels[i].setText(str(msg.data))
+                self.labels[i].setText(str({msg.data[i]}))
         else:
             self.labels.setText(str(msg.data))
 
