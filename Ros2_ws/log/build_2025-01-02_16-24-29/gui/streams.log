@@ -1,0 +1,25 @@
+[2.567s] Invoking command in '/home/araby/Cleaning_Robot_Project/Ros2_ws/src/gui': PYTHONPATH=/home/araby/Cleaning_Robot_Project/Ros2_ws/build/gui/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/araby/Cleaning_Robot_Project/Ros2_ws/install/gui/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/gui build --build-base /home/araby/Cleaning_Robot_Project/Ros2_ws/build/gui/build install --record /home/araby/Cleaning_Robot_Project/Ros2_ws/build/gui/install.log --single-version-externally-managed install_data
+[3.677s] running egg_info
+[3.679s] writing ../../build/gui/gui.egg-info/PKG-INFO
+[3.686s] writing dependency_links to ../../build/gui/gui.egg-info/dependency_links.txt
+[3.686s] writing entry points to ../../build/gui/gui.egg-info/entry_points.txt
+[3.686s] writing requirements to ../../build/gui/gui.egg-info/requires.txt
+[3.686s] writing top-level names to ../../build/gui/gui.egg-info/top_level.txt
+[3.695s] reading manifest file '../../build/gui/gui.egg-info/SOURCES.txt'
+[3.699s] writing manifest file '../../build/gui/gui.egg-info/SOURCES.txt'
+[3.701s] running build
+[3.702s] running build_py
+[3.702s] copying gui/keyboard.py -> /home/araby/Cleaning_Robot_Project/Ros2_ws/build/gui/build/lib/gui
+[3.702s] running install
+[3.703s] running install_lib
+[3.708s] copying /home/araby/Cleaning_Robot_Project/Ros2_ws/build/gui/build/lib/gui/keyboard.py -> /home/araby/Cleaning_Robot_Project/Ros2_ws/install/gui/lib/python3.10/site-packages/gui
+[3.711s] byte-compiling /home/araby/Cleaning_Robot_Project/Ros2_ws/install/gui/lib/python3.10/site-packages/gui/keyboard.py to keyboard.cpython-310.pyc
+[3.718s] running install_data
+[3.718s] running install_egg_info
+[3.727s] removing '/home/araby/Cleaning_Robot_Project/Ros2_ws/install/gui/lib/python3.10/site-packages/gui-0.0.0-py3.10.egg-info' (and everything under it)
+[3.754s] Copying ../../build/gui/gui.egg-info to /home/araby/Cleaning_Robot_Project/Ros2_ws/install/gui/lib/python3.10/site-packages/gui-0.0.0-py3.10.egg-info
+[3.754s] running install_scripts
+[3.917s] Installing guiNode script to /home/araby/Cleaning_Robot_Project/Ros2_ws/install/gui/lib/gui
+[3.921s] Installing keyboard_publisher script to /home/araby/Cleaning_Robot_Project/Ros2_ws/install/gui/lib/gui
+[3.930s] writing list of installed files to '/home/araby/Cleaning_Robot_Project/Ros2_ws/build/gui/install.log'
+[4.098s] Invoked command in '/home/araby/Cleaning_Robot_Project/Ros2_ws/src/gui' returned '0': PYTHONPATH=/home/araby/Cleaning_Robot_Project/Ros2_ws/build/gui/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/araby/Cleaning_Robot_Project/Ros2_ws/install/gui/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/gui build --build-base /home/araby/Cleaning_Robot_Project/Ros2_ws/build/gui/build install --record /home/araby/Cleaning_Robot_Project/Ros2_ws/build/gui/install.log --single-version-externally-managed install_data

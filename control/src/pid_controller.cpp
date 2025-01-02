@@ -1,66 +1,49 @@
 #include "pid_controller.h"
 
-// Constructor
-PIDController::PIDController(float Kp, float Ki, float Kd, float outputLimits, float deadzone, float dt, float alpha)
-    : kp(Kp), ki(Ki), kd(Kd), outputLimits(outputLimits), deadzone(deadzone), dt(dt), alpha(alpha),
-      error(0.0), integral(0.0), lastError(0.0), derivativeFiltered(0.0) {}
+PIDController::PIDController(float kp, float ki, float kd, float outputLimits,float deadzone)
+    : kp(kp), ki(ki), kd(kd),
+      error(0.0), integral(0.0), lastError(0.0),
+      setpoint(0.0), outputLimits(outputLimits),
+      deadzone(deadzone){}
 
-// Calculate PID output
-float PIDController::calculateOutput(float measurement)
-{
-  // Calculate error
-  error = setpoint - measurement;
+float PIDController::calculateOutput(float measurement) {
+  this->error = this->setpoint - measurement;
 
-  // Apply deadzone
-  if (std::abs(error) < deadzone)
-  {
-    error = 0.0;
+  // DeadZone : Limit the error term
+  if (abs(this->error) < this->deadzone) { this->error = 0.0; }
+
+  // Anti-windup: Limit the integral term
+  if (abs(this->error) > this->outputLimits) {
+      this->integral -= this->error * dt;
+  } else {
+      this->integral += this->error * dt;
   }
 
-  // Proportional term
-  float Pout = kp * error;
+  float derivative = (this->error - this->lastError) / dt;
+  this->lastError = this->error;
 
-  // Integral term with anti-windup
-  integral += error * dt;
-  if (std::abs(integral) > outputLimits)
-  {
-    integral = std::copysign(outputLimits, integral);
+  float output = this->kp * this->error + this->ki * this->integral + this->kd * derivative;
+
+  // Saturate the output
+  if (output > this->outputLimits) {
+      output = this->outputLimits;
+  } else if (output < -this->outputLimits) {
+      output = -this->outputLimits;
   }
-  float Iout = ki * integral;
-
-  // Derivative term with filtering
-  float derivative = (error - lastError) / dt;
-  derivativeFiltered = alpha * derivativeFiltered + (1 - alpha) * derivative;
-  float Dout = kd * derivativeFiltered;
-
-  // Calculate total output and apply limits
-  float output = Pout + Iout + Dout;
-  if (std::abs(output) > outputLimits)
-  {
-    output = std::copysign(outputLimits, output);
-  }
-
-  // Update last error
-  lastError = error;
 
   return output;
 }
 
-// Setters
-void PIDController::setSetpoint(float newSetpoint) { setpoint = newSetpoint; }
-void PIDController::setParameters(float Kp, float Ki, float Kd)
-{
-  kp = Kp;
-  ki = Ki;
-  kd = Kd;
+void PIDController::setParameters(float kp, float ki, float kd){
+  this->kp = kp;
+  this->ki = ki;
+  this->kd = kd;
 }
-void PIDController::setDt(float newDt) { dt = newDt; }
-void PIDController::setOutputLimits(float limit) { outputLimits = limit; }
 
-// Getters
-float PIDController::getSetpoint() const { return setpoint; }
-float PIDController::getKp() const { return kp; }
-float PIDController::getKi() const { return ki; }
-float PIDController::getKd() const { return kd; }
-float PIDController::getDt() const { return dt; }
-float PIDController::getOutputLimits() const { return outputLimits; }
+void PIDController::setSetpoint(float newSetpoint) {
+  this->setpoint = newSetpoint;
+}
+
+float PIDController::getSetpoint() const {
+  return this->setpoint;
+}

@@ -78,9 +78,8 @@ def main(args=None):
                             'd': 7,
                             'a': 8,
                             ' ': 9,
-                            'UP': 10,
-                            'DOWN': 11,
-                        }
+                            'A': 10,
+                            'B': 11}
             if key == '\x03':  # CTRL+C to exit
                 break
 

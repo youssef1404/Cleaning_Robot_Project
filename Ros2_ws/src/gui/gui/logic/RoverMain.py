@@ -26,7 +26,7 @@ import cv2 as cv
 
 
 
-address = "http://192.168.0.102:8080/video"
+address = "http://192.168.238.223:8080/video"
 
 class Rover_Main(QWidget, View):
     def __init__(self, parent = None, executor:MultiThreadedExecutor = None):

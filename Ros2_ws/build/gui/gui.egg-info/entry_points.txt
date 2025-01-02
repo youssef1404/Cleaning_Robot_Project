@@ -1,3 +1,4 @@
 [console_scripts]
-
+guiNode = gui.main:main
+keyboard_publisher = gui.keyboard:main
 
