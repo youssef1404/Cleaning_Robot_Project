@@ -25,7 +25,7 @@ class ObjectTrackingNode(Node):
         self.model = YOLO("best.pt") 
 
         # URL of IP Webcam video stream
-        self.url = 'http://192.168.1.106:8080/video' 
+        self.url = 'http://192.168.1.146:8080/video' 
 
         # Open the video stream
         self.cap = cv2.VideoCapture(self.url)
@@ -94,10 +94,16 @@ class ObjectTrackingNode(Node):
                 command = 1 # servo down
                 self.publisher.publish(Int8(data=command))
                 self.get_logger().info(f"{command}")
-                time.sleep(1)
+                command = 3 # magnet on
+                self.publisher.publish(Int8(data=command))
+                self.get_logger().info(f"{command}")
                 command = 2 # servo up
                 self.publisher.publish(Int8(data=command))
                 self.get_logger().info(f"{command}")
+                command = 4 # magnet off
+                self.publisher.publish(Int8(data=command))
+                self.get_logger().info(f"{command}")
+
             else:
                 command = 7 if error_x > 0 else 8  # 7 : right, 8 : left
         else:

@@ -1,7 +1,6 @@
 import rclpy
 from rclpy.node import Node
-from std_msgs.msg import Int8
-import time
+from std_msgs.msg import String  
 import cv2
 import torch
 from ultralytics import YOLO
@@ -14,8 +13,7 @@ class ObjectTrackingNode(Node):
         self.movement_topic = '/movement'
 
         # Publishers
-        # self.publisher = self.create_publisher(String, self.movement_topic, 10)
-        self.publisher = self.create_publisher(Int8, 'key_input', 10)
+        self.publisher = self.create_publisher(String, self.movement_topic, 10)
 
         # Check if CUDA (GPU) is available
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -25,7 +23,7 @@ class ObjectTrackingNode(Node):
         self.model = YOLO("best.pt") 
 
         # URL of IP Webcam video stream
-        self.url = 'http://192.168.1.106:8080/video' 
+        self.url = 'http://192.168.1.146:8080/video' 
 
         # Open the video stream
         self.cap = cv2.VideoCapture(self.url)
@@ -75,7 +73,7 @@ class ObjectTrackingNode(Node):
             rclpy.shutdown()
 
     def move_robot(self):
-        command = 0
+        command = ""
 
         if self.object_center is not None:
             # Calculate error
@@ -83,28 +81,14 @@ class ObjectTrackingNode(Node):
 
             # Control logic
             if abs(error_x) < 20:  # Tolerance for centered object
-                while self.object_center is not None:
-                    command = 5 # forward
-                    self.publisher.publish(Int8(data=command))
-                    self.get_logger().info(f"{command}")
-
-                command = 9 #stop
-                self.publisher.publish(Int8(data=command))
-                self.get_logger().info(f"{command}")
-                command = 1 # servo down
-                self.publisher.publish(Int8(data=command))
-                self.get_logger().info(f"{command}")
-                time.sleep(1)
-                command = 2 # servo up
-                self.publisher.publish(Int8(data=command))
-                self.get_logger().info(f"{command}")
+                command = "forward"
             else:
-                command = 7 if error_x > 0 else 8  # 7 : right, 8 : left
+                command = "right" if error_x > 0 else "left"
         else:
-            command = 7 # left left left = beylef
-        
+            command = "explore"
 
-        self.publisher.publish(Int8(data=command))
+        # Publish movement commands
+        self.publisher.publish(String(data=command))  # Publish the command as a String message
         self.get_logger().info(f"{command}")
 
 def main(args=None):
