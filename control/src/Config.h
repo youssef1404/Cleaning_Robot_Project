@@ -13,10 +13,10 @@
 #define kd1 0.01
 
 #define pin_A1 36
-#define pin_A2 34
+#define pin_A2 35
 
 #define pin_B1 39
-#define pin_B2 35
+#define pin_B2 34
 
 #define enable_pin_1 21
 #define enable_pin_2 16

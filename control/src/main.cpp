@@ -104,12 +104,12 @@ void setup(){
 
   create_entities();
 
-  // timer.every(TIME_FREQ, update_encoder);
+  timer.every(TIME_FREQ, update_encoder);
 
-  // attachInterrupt(digitalPinToInterrupt(Interrupt[0].pin_A), Motor0_ISR_EncoderA, CHANGE);
-  // attachInterrupt(digitalPinToInterrupt(Interrupt[0].pin_B), Motor0_ISR_EncoderB, CHANGE);
-  // attachInterrupt(digitalPinToInterrupt(Interrupt[1].pin_A), Motor1_ISR_EncoderA, CHANGE);
-  // attachInterrupt(digitalPinToInterrupt(Interrupt[1].pin_B), Motor1_ISR_EncoderB, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(Interrupt[0].pin_A), Motor0_ISR_EncoderA, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(Interrupt[0].pin_B), Motor0_ISR_EncoderB, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(Interrupt[1].pin_A), Motor1_ISR_EncoderA, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(Interrupt[1].pin_B), Motor1_ISR_EncoderB, CHANGE);
 }
 
 void loop(){
