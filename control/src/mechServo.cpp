@@ -3,10 +3,10 @@
 void MechServo::init(){
     this->mechServo.attach(SERVO_PIN);
     this->currentAngle = LOWER_LIMIT;
-    pinMode(SERVO_VCC, OUTPUT);
+    // pinMode(SERVO_VCC, OUTPUT);
     pinMode(MAGNET_PIN, OUTPUT);
     digitalWrite(MAGNET_PIN, LOW);
-    digitalWrite(SERVO_VCC, HIGH);
+    // digitalWrite(SERVO_VCC, HIGH);
     this->mechServo.write(15);
     // delay(15);
 }

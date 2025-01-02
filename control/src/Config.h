@@ -18,12 +18,12 @@
 #define pin_B1 39
 #define pin_B2 35
 
-#define enable_pin_1 23
-#define enable_pin_2 22
-#define input1_1 21
-#define input1_2 19
-#define input2_1 18
-#define input2_2 5
+#define enable_pin_1 21
+#define enable_pin_2 16
+#define input1_1 19
+#define input1_2 18
+#define input2_1 5
+#define input2_2 17
 
 #define default_speed 170
 
@@ -35,6 +35,6 @@
 
 #define SERVO_VCC 17    
 #define SERVO_PIN 23
-#define MAGNET_PIN 16
+#define MAGNET_PIN 32
 #define UPPER_LIMIT 180
 #define LOWER_LIMIT 0

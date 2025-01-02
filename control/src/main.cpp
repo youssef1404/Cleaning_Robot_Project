@@ -27,6 +27,7 @@ rcl_publisher_t counts_publisher;
 rcl_subscription_t speed_setpoint_subscriper;
 rcl_subscription_t pid_parameters_subscirper;
 rcl_subscription_t key_input_subscriber;
+// rcl_subscription_t cmd_input_subscriber;
 
 std_msgs__msg__Float32MultiArray pid_output_msg;
 std_msgs__msg__Float32MultiArray speed_feedback_msg;
@@ -34,6 +35,7 @@ std_msgs__msg__Float32MultiArray counts_msg;
 std_msgs__msg__Float32MultiArray speed_setpoint_msg;
 std_msgs__msg__Float32MultiArray pid_parameters__msg;
 std_msgs__msg__Int8 key_msg;
+// std_msgs__msg__Int8 cmd_msg;
 
 Timer timer;
 
@@ -74,7 +76,6 @@ L298N l298n[]{L298N(enable_pin_1, input1_1, input2_1),
 MotorDriver driver;
 MechServo servo;
 
-
 float counts_data[] = {0,0};
 float setpoint[] = {1,1};
 float speed_feedback[] = {0,0};
@@ -112,10 +113,10 @@ void setup(){
 }
 
 void loop(){
-  // timer.update();
+  timer.update();
   // speed_controll();
-  // publish_readings();
-  // delay(10);
+  publish_readings();
+  delay(10);
   rclc_executor_spin_some(&executor, RCL_MS_TO_NS(20));
 }
 
@@ -184,7 +185,6 @@ void pid_parameters_callback(const void *msgin)
   pid_parameters[5] = msg->data.data[5];
 }
 
-
 void key_input_callback(const void *msgin)
 {
   const std_msgs__msg__Int8 * msg = (const std_msgs__msg__Int8 *)msgin;
@@ -193,6 +193,15 @@ void key_input_callback(const void *msgin)
   Serial.println(key);
   handleKeys(key);
 }
+
+// void cmd_input_callback(const void *msgin)
+// {
+//   const std_msgs__msg__Int8 * msg = (const std_msgs__msg__Int8 *)msgin;
+//   uint8_t key = msg->data;
+//   Serial.println("command number ");
+//   Serial.println(key);
+//   handleKeys(key);
+// }
 
 void Motor0_ISR_EncoderA()
 {
