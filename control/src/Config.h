@@ -20,18 +20,14 @@
 
 #define enable_pin_1 21
 #define enable_pin_2 16
-#define input1_1 19
-#define input1_2 18
-#define input2_1 5
-#define input2_2 17
+#define input1_1 18
+#define input1_2 19
+#define input2_1 17
+#define input2_2 5
 
-#define default_speed 170
-
-// Wi-Fi credentials
-#define WIFI_SSID "Honor 50"       
-#define WIFI_PASSWORD "12345678" 
-#define AGENT_IP "192.168.5.203"           
-#define AGENT_PORT 8888
+#define MAX_SPEED 255
+#define MIN_SPEED 0
+#define DEFAULT_SPEED 128
 
 #define SERVO_VCC 17    
 #define SERVO_PIN 23

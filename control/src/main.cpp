@@ -27,7 +27,7 @@ rcl_publisher_t counts_publisher;
 rcl_subscription_t speed_setpoint_subscriper;
 rcl_subscription_t pid_parameters_subscirper;
 rcl_subscription_t key_input_subscriber;
-// rcl_subscription_t cmd_input_subscriber;
+rcl_subscription_t speed_control_subscriber;
 
 std_msgs__msg__Float32MultiArray pid_output_msg;
 std_msgs__msg__Float32MultiArray speed_feedback_msg;
@@ -35,7 +35,7 @@ std_msgs__msg__Float32MultiArray counts_msg;
 std_msgs__msg__Float32MultiArray speed_setpoint_msg;
 std_msgs__msg__Float32MultiArray pid_parameters__msg;
 std_msgs__msg__Int8 key_msg;
-// std_msgs__msg__Int8 cmd_msg;
+std_msgs__msg__Int8 speed_msg;
 
 Timer timer;
 
@@ -46,6 +46,7 @@ void publish_readings();
 void speed_setpoint_callback(const void *msgin);
 void pid_parameters_callback(const void *msgin);
 void key_input_callback(const void *msgin);
+void speed_callback(const void *msgin);
 void Motor0_ISR_EncoderA();
 void Motor0_ISR_EncoderB();
 void Motor1_ISR_EncoderA();
@@ -53,14 +54,15 @@ void Motor1_ISR_EncoderB();
 void create_entities();
 void printWifiStatus();
 void handleKeys(uint8_t key);
+void handleSpeeds(uint8_t key);
 
 // WiFi credentials
-const char* ssid = "Honor 50";
+const char* ssid = "OPPO Reno6";
 const char* password = "12345678";
 
 // Micro-ROS agent settings
 const size_t agent_port = 8888;
-IPAddress agent_ip(192, 168, 5, 203);
+IPAddress agent_ip(192, 168, 248, 28);
 
 //creating PID objects
 PIDController PID[]{PIDController(kp0, ki0, kd0, OUTPUTLIMITS, DEADZONE),
@@ -73,6 +75,7 @@ eInterrupt Interrupt[]{eInterrupt(pin_A1, pin_B1, RESOLUTION),
 //creating motor driver objects
 L298N l298n[]{L298N(enable_pin_1, input1_1, input2_1),
               L298N(enable_pin_2, input1_2, input2_2)};
+
 MotorDriver driver;
 MechServo servo;
 
@@ -158,9 +161,9 @@ void publish_readings()
   rcl_publish(&pid_output_publisher, &pid_output_msg, NULL);
   rcl_publish(&speed_feedback_publisher, &speed_feedback_msg, NULL);
   rcl_publish(&counts_publisher, &counts_msg, NULL);
-  Serial.println("encoder counts ");
-  Serial.println(counts_data[0]);
-  Serial.println(counts_data[1]);
+  // Serial.println("encoder counts ");
+  // Serial.println(counts_data[0]);
+  // Serial.println(counts_data[1]);
 }
 
 void speed_setpoint_callback(const void *msgin)
@@ -168,10 +171,10 @@ void speed_setpoint_callback(const void *msgin)
   const std_msgs__msg__Float32MultiArray * msg = (const std_msgs__msg__Float32MultiArray *)msgin;
   setpoint[0] = msg->data.data[0];
   setpoint[1] = msg->data.data[1];
-  Serial.println("setpoint 1: ");
-  Serial.println(setpoint[0]);
-  Serial.println("setpoint 2: ");
-  Serial.println(setpoint[1]);
+  // Serial.println("setpoint 1: ");
+  // Serial.println(setpoint[0]);
+  // Serial.println("setpoint 2: ");
+  // Serial.println(setpoint[1]);
 }
 
 void pid_parameters_callback(const void *msgin)
@@ -194,14 +197,14 @@ void key_input_callback(const void *msgin)
   handleKeys(key);
 }
 
-// void cmd_input_callback(const void *msgin)
-// {
-//   const std_msgs__msg__Int8 * msg = (const std_msgs__msg__Int8 *)msgin;
-//   uint8_t key = msg->data;
-//   Serial.println("command number ");
-//   Serial.println(key);
-//   handleKeys(key);
-// }
+void speed_callback(const void *msgin)
+{
+  const std_msgs__msg__Int8 * msg = (const std_msgs__msg__Int8 *)msgin;
+  uint8_t key = msg->data;
+  Serial.println("command number ");
+  Serial.println(key);
+  handleSpeeds(key);
+}
 
 void Motor0_ISR_EncoderA()
 {
@@ -273,6 +276,12 @@ void create_entities(){
     ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Int8),
     "/key_input");
 
+  rclc_subscription_init_default(
+    &speed_control_subscriber,
+    &node,
+    ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Int8),
+    "/speed");
+
   speed_setpoint_msg.data.capacity = 2;
   pid_parameters__msg.data.capacity = 6;
 
@@ -283,6 +292,7 @@ void create_entities(){
   rclc_executor_add_subscription(&executor, &speed_setpoint_subscriper, &speed_setpoint_msg, &speed_setpoint_callback, ON_NEW_DATA);
   rclc_executor_add_subscription(&executor, &pid_parameters_subscirper, &pid_parameters__msg, &pid_parameters_callback, ON_NEW_DATA);
   rclc_executor_add_subscription(&executor, &key_input_subscriber, &key_msg, &key_input_callback, ON_NEW_DATA);
+  rclc_executor_add_subscription(&executor, &speed_control_subscriber, &speed_msg, &speed_callback, ON_NEW_DATA);
 }
 
 void handleKeys(uint8_t key){
@@ -313,6 +323,23 @@ void handleKeys(uint8_t key){
       break;
     case 4: // turn off the magnet
       digitalWrite(MAGNET_PIN, LOW);
+      break;
+    default:
+      break;
+  }
+}
+
+void handleSpeeds(uint8_t key) {
+  static uint8_t speedLevel = 5; // Start at middle speed
+  
+  switch(key) {
+    case 10: // Speed up
+      if (speedLevel < 10) speedLevel++;
+      driver.setSpeed(round(speedLevel * 25.5)); // 255/10 = 25.5 for 10 levels
+      break;
+    case 11: // Speed down
+      if (speedLevel > 0) speedLevel--;
+      driver.setSpeed(round(speedLevel * 25.5));
       break;
     default:
       break;

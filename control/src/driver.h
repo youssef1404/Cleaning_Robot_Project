@@ -25,7 +25,7 @@ class MotorDriver
         const uint8_t driverPins[6] = {input1_1, input1_2, input2_1, input2_2, enable_pin_1, enable_pin_2};
         int stateMotorA;     // 0: static, 1: forward, -1: backward
         int stateMotorB;     // 0: static, 1: forward, -1: backward
-        int speed;
+        int speed = DEFAULT_SPEED;
 
     public:
         void moveForward();

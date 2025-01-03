@@ -7,8 +7,8 @@ void MotorDriver::initialMotors(){
     for (int i = 0; i < 6; i++){
         pinMode(this->driverPins[i], OUTPUT);
     }
-    analogWrite(enable_pin_1, default_speed);
-	analogWrite(enable_pin_2, default_speed);
+    analogWrite(enable_pin_1, this->speed);
+	analogWrite(enable_pin_2, this->speed);
     // stop the motors
     MotorDriver::stop();
 }
@@ -24,6 +24,8 @@ void MotorDriver::moveForward() {
 
     this->stateMotorA = 1;
     this->stateMotorB = 1;
+    analogWrite(enable_pin_1, this->speed);
+	analogWrite(enable_pin_2, this->speed);
 }
 
 void MotorDriver::moveBackward() {
@@ -35,24 +37,33 @@ void MotorDriver::moveBackward() {
     // Motor B forward
     digitalWrite(this->driverPins[2], HIGH); // IN3
     digitalWrite(this->driverPins[3], LOW); // IN4
-}
 
-void MotorDriver::rotateRight() {
-    Serial.println("moving Right");
-    // Rotate in place by stopping one motor
-    digitalWrite(this->driverPins[0], LOW); // IN1
-    digitalWrite(this->driverPins[1], HIGH); // IN2
-    digitalWrite(this->driverPins[2], LOW); // IN3
-    digitalWrite(this->driverPins[3], LOW); // IN4
+    analogWrite(enable_pin_1, this->speed);
+	analogWrite(enable_pin_2, this->speed);
 }
 
 void MotorDriver::rotateLeft() {
     Serial.println("moving Left");
     // Rotate in place by stopping one motor
     digitalWrite(this->driverPins[0], LOW); // IN1
+    digitalWrite(this->driverPins[1], HIGH); // IN2
+    digitalWrite(this->driverPins[2], HIGH); // IN3
+    digitalWrite(this->driverPins[3], LOW); // IN4
+
+    analogWrite(enable_pin_1, this->speed);
+	analogWrite(enable_pin_2, this->speed);
+}
+
+void MotorDriver::rotateRight() {
+    Serial.println("moving Right");
+    // Rotate in place by stopping one motor
+    digitalWrite(this->driverPins[0], HIGH); // IN1
     digitalWrite(this->driverPins[1], LOW); // IN2
     digitalWrite(this->driverPins[2], LOW); // IN3
     digitalWrite(this->driverPins[3], HIGH); // IN4
+
+    analogWrite(enable_pin_1, this->speed);
+	analogWrite(enable_pin_2, this->speed);
 }
 
 void MotorDriver::stop() {

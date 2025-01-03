@@ -13,7 +13,7 @@ from main_window import Ui_MainWindow as View
 
 sys.path.append("src/gui/gui/logic")
 from RoverMain import Rover_Main 
-from detection import ObjectTracking
+from hand_tracking import HandTracking
 
 sys.path.append("src/gui/gui/utils")
 from utilss import Utils
@@ -30,10 +30,10 @@ class MyGUI(QMainWindow, View):
         rclpy.init()
         self.executor = MultiThreadedExecutor()
         self.RoverMainTab = Rover_Main(executor = self.executor)
-        self.DetectionTab = ObjectTracking(executor = self.executor)
+        self.GestureTab = HandTracking(executor = self.executor)
 
         self.tabWidget.addTab(self.RoverMainTab, "Main")
-        self.tabWidget.addTab(self.DetectionTab, "Detection")
+        self.tabWidget.addTab(self.GestureTab, "Hand Gesture")
 
         executor_thread = Thread(target=self.executor.spin, daemon=True)
         executor_thread.start()
