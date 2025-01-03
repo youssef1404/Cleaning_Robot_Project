@@ -13,29 +13,23 @@
 #define kd1 0.01
 
 #define pin_A1 36
-#define pin_A2 34
+#define pin_A2 35
 
 #define pin_B1 39
-#define pin_B2 35
+#define pin_B2 34
 
 #define enable_pin_1 21
 #define enable_pin_2 16
-#define input1_1 19
-#define input1_2 18
-#define input2_1 5
-#define input2_2 17
+#define input1_1 18
+#define input1_2 19
+#define input2_1 17
+#define input2_2 5
 
-#define default_speed 200
-#define min_speed 100
-#define max_speed 256
+#define MAX_SPEED 255
+#define MIN_SPEED 0
+#define DEFAULT_SPEED 128
 
-// Wi-Fi credentials
-#define WIFI_SSID "Araby"       
-#define WIFI_PASSWORD "AhmedAraby" 
-#define AGENT_IP "192.168.107.223"           
-#define AGENT_PORT 8888
-
-// #define SERVO_VCC 17    
+#define SERVO_VCC 17    
 #define SERVO_PIN 23
 #define MAGNET_PIN 32
 #define UPPER_LIMIT 180

@@ -29,20 +29,21 @@ class KeyboardPublisher(Node):
     """
     def __init__(self):
         super().__init__('keyboard_publisher')
-        self.publisher_setPoint = self.create_publisher(Float32MultiArray, 'speed_setpoint', 10)
-        self.publisher_keys = self.create_publisher(Int8, 'key_input', 10)
+        # self.publisher_setPoint = self.create_publisher(Float32MultiArray, 'speed_setpoint', 10)
+        self.publisher_keys = self.create_publisher(Int8, '/key_input', 10)
+        self.publisher_speeds = self.create_publisher(Int8, '/speed', 10)
         self.get_logger().info("Keyboard Publisher Node has started. Press keys to publish them.")
         self.msgsent = [0.0,0.0]
         self.speed = 255.0
 
-    def publish_setPoint(self, key):
-        """
-        Publish the corresponding key value to the 'key_input' topic.
-        """
-        msg = Float32MultiArray()
-        msg.data = key
-        self.publisher_setPoint.publish(msg)
-        self.get_logger().info(f'Published: {key}')
+    # def publish_setPoint(self, key):
+    #     """
+    #     Publish the corresponding key value to the 'key_input' topic.
+    #     """
+    #     msg = Float32MultiArray()
+    #     msg.data = key
+    #     self.publisher_setPoint.publish(msg)
+    #     self.get_logger().info(f'Published: {key}')
 
     def publish_keys(self, key):
         """
@@ -51,6 +52,15 @@ class KeyboardPublisher(Node):
         msg = Int8()
         msg.data = key
         self.publisher_keys.publish(msg)
+        self.get_logger().info(f'Published: {key}')
+
+    def publish_speeds(self, key):
+        """
+        Publish the corresponding key value to the 'key_input' topic.
+        """
+        msg = Int8()
+        msg.data = key
+        self.publisher_speeds.publish(msg)
         self.get_logger().info(f'Published: {key}')
 
 def main(args=None):
@@ -68,18 +78,19 @@ def main(args=None):
             #                 'a': [keyboard_publisher.speed, 0.0],
             #                 ' ': [0.0, 0.0]}
 
-            # servo readings
-            key_mappings = {'m': 1,
-                            'n': 2,
-                            'b': 3,
-                            'v': 4,
-                            'w': 5,
-                            's': 6,
-                            'd': 7,
-                            'a': 8,
-                            ' ': 9,
-                            'A': 10,
-                            'B': 11}
+            key_mappings = {'m': 1, # up servo
+                            'n': 2, # down servo
+                            'b': 3, # magnet on
+                            'v': 4, # magnet off
+                            'w': 5, # forward
+                            's': 6, # backward
+                            'd': 7, # right
+                            'a': 8, # left
+                            ' ': 9 # stop
+                            } 
+            
+            speed_control = {'p' : 10, 'o' : 11}
+
             if key == '\x03':  # CTRL+C to exit
                 break
 
@@ -87,6 +98,8 @@ def main(args=None):
             #     keyboard_publisher.publish_setPoint(key_mapping_move[key])
             if key in key_mappings:
                 keyboard_publisher.publish_keys(key_mappings[key])
+            elif key in speed_control:
+                keyboard_publisher.publish_speeds(speed_control[key])
             else:
                 keyboard_publisher.get_logger().warn(f"Unmapped key '{key}' pressed. Ignoring.")
 

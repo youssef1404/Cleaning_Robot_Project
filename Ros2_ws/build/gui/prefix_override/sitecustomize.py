@@ -1,4 +1,3 @@
 import sys
-if sys.prefix == '/usr':
-    sys.real_prefix = sys.prefix
-    sys.prefix = sys.exec_prefix = '/home/araby/Cleaning_Robot_Project/Ros2_ws/install/gui'
+sys.real_prefix = sys.prefix
+sys.prefix = sys.exec_prefix = '/home/youssef/cleaning_robot_project/Ros2_ws/install/gui'

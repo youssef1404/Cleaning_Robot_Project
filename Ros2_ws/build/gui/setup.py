@@ -1,1 +1,1 @@
-/home/youssef/cleaning_robot_project/Ros2_ws/src/GUI/setup.py
+/home/youssef/cleaning_robot_project/Ros2_ws/src/gui/setup.py
