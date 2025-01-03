@@ -32,7 +32,10 @@ class Rover_Main(QWidget, View, Node):
         self.setupUi(self)
         self.excutor = executor
         
-        self.url = "http://192.168.5.36:8080/video"
+        self.url = "http://192.168.1.3:8080/video"
+
+        self.def_speed_level = 5
+        self.speed_label.setText(str(self.def_speed_level))
         
         # Initialize nodes and components as before
         self.webcam = Camera(name='main', address = self.url, label=self.camera_label)
@@ -40,8 +43,14 @@ class Rover_Main(QWidget, View, Node):
         self.speed_feedback = Comsystem(name="speed_feedback", labels=[self.speed_label_1, self.speed_label_2], sub_name="speed_feedback")
         self.encoder_counts = Comsystem(name="encoder_counts", labels=[self.count_label_1, self.count_label_2], sub_name="counts")
         
-        # Add new publisher for mode state
+        # Add publishers and subscribers
         self.mode_publisher = self.create_publisher(Int8, 'mode_state', 10)
+        self.speed_subscriber = self.create_subscription(
+            Int8,
+            '/speed',
+            self.speed_callback,
+            10
+        )
         
         # Add nodes to executor
         self.excutor.add_node(self.webcam)
@@ -52,7 +61,6 @@ class Rover_Main(QWidget, View, Node):
         
         # Connect buttons
         self.screenButton.clicked.connect(self.captureScreenshot)
-        # self.stopButton.clicked.connect(self.stop_feed)
         self.auto_button.clicked.connect(self.enableAuto)
         self.manuel_button.clicked.connect(self.enableManuel)
         self.hand_button.clicked.connect(self.enableHandGest)
@@ -79,8 +87,6 @@ class Rover_Main(QWidget, View, Node):
         else:
             self.get_logger().warn("Can't captured screenshot !!!")
 
-    def stop_feed(self):
-        self.webcam.stop()
 
     def enableManuel(self):
         """Enable manual mode and publish state"""
@@ -116,3 +122,11 @@ class Rover_Main(QWidget, View, Node):
             self.mode_label.setText("Auto")
         else:
             self.mode_label.setText("Hand Gesture")
+
+    def speed_callback(self, msg):
+        if msg.data == 10 and self.def_speed_level < 10:
+            self.def_speed_level += 1
+        elif msg.data == 11 and self.def_speed_level > 0:
+            self.def_speed_level -= 1
+        self.speed_label.setText(str(self.def_speed_level))
+        

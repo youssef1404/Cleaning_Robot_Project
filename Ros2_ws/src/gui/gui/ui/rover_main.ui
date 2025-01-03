@@ -984,9 +984,9 @@ QAbstractSpinBox {
    <property name="geometry">
     <rect>
      <x>1050</x>
-     <y>140</y>
+     <y>130</y>
      <width>301</width>
-     <height>241</height>
+     <height>311</height>
     </rect>
    </property>
    <property name="title">
@@ -1123,6 +1123,78 @@ QAbstractSpinBox {
      <rect>
       <x>170</x>
       <y>180</y>
+      <width>121</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>13</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_14">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>220</y>
+      <width>71</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>14</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Speed:</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_15">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>260</y>
+      <width>91</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>14</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Direction:</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="speed_label">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>220</y>
+      <width>121</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>13</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="dir_label">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>260</y>
       <width>121</width>
       <height>31</height>
      </rect>
@@ -1627,8 +1699,8 @@ QAbstractSpinBox {
   <widget class="QPushButton" name="manuel_button">
    <property name="geometry">
     <rect>
-     <x>1210</x>
-     <y>500</y>
+     <x>1200</x>
+     <y>560</y>
      <width>121</width>
      <height>41</height>
     </rect>
@@ -1652,8 +1724,8 @@ QAbstractSpinBox {
   <widget class="QPushButton" name="auto_button">
    <property name="geometry">
     <rect>
-     <x>1070</x>
-     <y>500</y>
+     <x>1060</x>
+     <y>560</y>
      <width>111</width>
      <height>41</height>
     </rect>
@@ -1726,31 +1798,6 @@ QAbstractSpinBox {
     </property>
    </widget>
   </widget>
-  <widget class="QPushButton" name="stop_button">
-   <property name="geometry">
-    <rect>
-     <x>1230</x>
-     <y>690</y>
-     <width>111</width>
-     <height>41</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>Ubuntu</family>
-     <pointsize>-1</pointsize>
-     <weight>50</weight>
-     <italic>false</italic>
-     <bold>false</bold>
-    </font>
-   </property>
-   <property name="mouseTracking">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Stop</string>
-   </property>
-  </widget>
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
@@ -1785,8 +1832,8 @@ QAbstractSpinBox {
   <widget class="QFrame" name="frame_6">
    <property name="geometry">
     <rect>
-     <x>1060</x>
-     <y>400</y>
+     <x>1050</x>
+     <y>470</y>
      <width>271</width>
      <height>61</height>
     </rect>
@@ -1832,8 +1879,8 @@ QAbstractSpinBox {
   <widget class="QPushButton" name="hand_button">
    <property name="geometry">
     <rect>
-     <x>1130</x>
-     <y>560</y>
+     <x>1120</x>
+     <y>620</y>
      <width>141</width>
      <height>41</height>
     </rect>
