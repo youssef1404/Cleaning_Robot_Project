@@ -1,54 +1,120 @@
-# Cleaning_Robot_Project
-# **Magnetic Metal Detector Robot**
 
-## **Overview**  
-The Magnetic Metal Detector Robot is designed to autonomously detect ferromagnetic metals, navigate to their location, pick them up, and store them in a dedicated compartment. This project integrates advanced robotics concepts using ROS 2 and micro-ROS, combining precise hardware control with efficient software communication systems.
+# Metal Collector Robot
 
----
-
-## **Features**  
-- **Ferromagnetic Metal Detection**: Identifies metals that can be magnetized using a sensitive magnetic sensor.  
-- **Autonomous Navigation**: Uses decision-making logic to move towards the detected metal.  
-- **Object Handling**: A servo motor picks up the detected object and places it in a storage compartment.  
-- **Distributed Control System**: Implements ROS 2 nodes for modular and scalable system design.  
-- **micro-ROS Integration**: Leverages ESP controllers to seamlessly communicate within the ROS 2 ecosystem.  
-- **Custom Power Management**: A custom-designed PCB ensures stable power delivery to all components.  
+## Overview
+The Metal Collector Robot is an innovative project designed to autonomously or manually detect and collect metal objects and place them into a designated box. This system combines robotics, computer vision, and ROS2 for seamless operation and interaction between hardware and software components.
 
 ---
 
-## **Hardware Components**  
+## Features
+1. **Metal Detection and Collection**
+   - Detects metal objects using a webcam and YOLO model.
+   - Collects detected metals using a mechanical system and deposits them into a box.
 
-### **Key Components**  
-1. **ESP Controller**: Handles micro-ROS communication and robot control.  
-2. **Magnetic Sensor**: Detects the presence of ferromagnetic metals.  
-3. **Motor Driver (L298)**: Controls the DC motors for navigation.  
-4. **Servo Motor**: Picks up and stores the detected metal objects.  
-5. **Power Distribution Board (PCB)**: Custom-designed PCB with voltage regulators, connectors, and power status LEDs.  
-6. **3D Printed Body**: Designed for optimal durability and functionality.  
-7. **Rubber Wheels**: Provide smooth movement and stability.  
-8. **Miscellaneous Components**: Wires, connectors, and resistors for wiring and assembly.  
+2. **Operational Modes**
+   - **Manual Mode:** Control the robot using a keyboard interface on the laptop.
+   - **Autonomous Mode:** Automatically detects and collects metals using the YOLO model and a webcam.
+
+3. **Communication Architecture**
+   - **Laptop:**
+     - Acts as the central control hub, running the ROS2 server.
+     - Hosts the Graphical User Interface (GUI) that allows users to visualize camera feedback, monitor sensor data, and control the robot.
+     - The ROS2 server facilitates communication between various nodes, such as those for YOLO-based detection, manual control, and sensor feedback.
+   
+   - **ESP32:**
+     - Functions as the robot's onboard controller, handling real-time tasks such as motor control and sensor data acquisition.
+     - Equipped with Micro-ROS, which ensures efficient and reliable communication with the ROS2 server on the laptop.
+     - Receives commands (e.g., movement or mode changes) from the ROS2 server and sends sensor data back to the laptop for monitoring and decision-making.
+
+4. **Graphical User Interface (GUI)**
+   - Displays live camera feed.
+   - Shows sensor data in real-time.
+   - Allows mode selection (manual or autonomous).
+   - Provides control options for robot operation.
 
 ---
 
-## **ROS and micro-ROS Communication**  
+## System Architecture
+1. **Hardware Components**
+   - **ESP32:** Acts as the robot's microcontroller for movement and sensor processing.
+   - **Webcam:** Captures video feed for YOLO-based object detection.
+   - **Motors and Mechanism:** Enables movement and collection of metal objects.
 
-The system utilizes ROS 2 for high-level control and micro-ROS for low-level communication between the ESP controllers and the main ROS system.  
-
-### **How It Works:**  
-1. **Sensor Data**: Magnetic sensor data is published to a ROS topic by the micro-ROS client on the ESP.  
-2. **Navigation**: ROS nodes process the sensor data and send movement commands to the robot.  
-3. **Object Handling**: When the robot reaches the target, it commands the servo motor to pick up the object.  
-4. **Feedback**: The micro-ROS client on the ESP sends the status back to the ROS 2 system for real-time updates.  
+2. **Software Components**
+   - **ROS2:** Manages communication between nodes on the laptop.
+   - **Micro-ROS:** Facilitates communication between ESP32 and the ROS2 server.
+   - **YOLO Model:** Processes webcam feed to detect metal objects.
+   - **Keyboard Node:** Allows manual robot control via the laptop.
+   - **GUI Application:** Provides a user-friendly interface for operation and monitoring.
 
 ---
 
-## **PCB Design**  
+## Installation and Setup
+### Prerequisites
+- ROS2 installed on the laptop.
+- Micro-ROS library configured for ESP32.
+- YOLO model dependencies installed.
 
-The custom PCB integrates power regulation, connection points for components, and indicators for system health.  
+### Steps
+1. **ESP32 Configuration**
+   - Flash Micro-ROS firmware onto ESP32.
+   - Connect sensors and motors as per the wiring diagram.
 
-### **Key Features:**  
-- **Voltage Regulators**: Stable power delivery for all components.  
-- **Power LEDs**: Visual indicators for power status.  
-- **Magnetic Sensor Interface**: Dedicated connections for the magnetic sensor.  
-- **Compact Design**: Optimized layout for space efficiency.  
+2. **ROS2 Workspace**
+   - Clone the repository and build the ROS2 workspace:
+     ```bash
+     mkdir -p ~/metal_collector_ws/src
+     cd ~/metal_collector_ws/src
+     git clone <repository-url>
+     cd ..
+     colcon build
+     ```
+   - Source the workspace:
+     ```bash
+     source ~/metal_collector_ws/install/setup.bash
+     ```
 
+3. **Launching Nodes**
+   - Running the Agent:
+     ```bash
+     ros2 run micro_ros_agent micro_ros_agent udp4 --port 8888 
+     ```
+   - Launch the GUI:
+     ```bash
+     ros2 run gui guiNode
+     ```
+   - Run the YOLO detection node:
+     ```bash
+     ros2 run gui yolo_node
+     ```
+
+---
+
+## Usage
+1. **Manual Mode**
+   - Use the keyboard node to control the robot manually:
+     ```bash
+     ros2 run gui keyboard_publisher
+     ```
+
+2. **Autonomous Mode**
+   - Activate autonomous mode from the GUI or by publishing a command:
+     ```bash
+     ros2 topic pub /robot_mode std_msgs/String "data: 'autonomous'"
+     ```
+
+3. **Monitoring and Control**
+   - Use the GUI to:
+     - View live camera feed.
+     - Monitor sensor data.
+     - Switch between manual and autonomous modes.
+
+---
+
+## Future Enhancements
+- Integrating additional sensors for enhanced navigation.
+- Adding a feature to sort metals by type.
+- Improving YOLO model accuracy for specific metal detection.
+- Implementing a mobile app for remote control and monitoring.
+
+---
